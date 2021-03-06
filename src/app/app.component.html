@@ -1,0 +1,17 @@
+<nb-layout>
+  <nb-layout-column>
+    local
+    <button (click)="this.lc.createNewOffer()" nbButton> Create offer</button>
+    <input (input)="setAnswer()" [(ngModel)]="answerModel" nbInput placeholder="Input" type="text"/>
+    {{this.offer}}
+  </nb-layout-column>
+  <nb-layout-column>
+    remote
+    <button (click)="rc.createNewAnswer()" nbButton> Create answer</button>
+    <input (input)="setOffer()" [(ngModel)]="offerModel" nbInput placeholder="Input" type="text"/>
+    {{this.answer}}
+  </nb-layout-column>
+  <nb-layout-column>
+    <button (click)="this.backendSocketService.requestNewGame()" nbButton>Send</button>
+  </nb-layout-column>
+</nb-layout>
