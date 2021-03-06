@@ -1,7 +1,14 @@
-<nb-layout *ngIf="name === undefined">
-  <nb-layout-column>
+<nb-layout>
+  <nb-layout-header>
+    <button [routerLink]="'/new-game'" ghost nbButton size="giant">
+      <nb-icon icon="home-outline" size="giant"></nb-icon>
+      Home
+    </button>
+  </nb-layout-header>
 
-    <nb-card class="text-center">
+  <nb-layout-column class="text-center">
+
+    <nb-card *ngIf="name === undefined" class="text-center">
       <nb-card-header>
         Hey that's illegal
       </nb-card-header>
@@ -9,14 +16,9 @@
         Go back to the <a [routerLink]="'/new-game'">main page</a>
       </nb-card-body>
     </nb-card>
-  </nb-layout-column>
-</nb-layout>
 
 
-<nb-layout *ngIf="name !== undefined">
-  <nb-layout-column>
-
-    <nb-card class="text-center">
+    <nb-card *ngIf="name !== undefined" class="text-center">
       <nb-card-header>
         Hey {{this.name}}, we are waiting for your friends
       </nb-card-header>

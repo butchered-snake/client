@@ -9,6 +9,7 @@ import {AppRoutingModule} from './app-routing.module';
 import {NewGameModule} from './pages/new-game/new-game.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {LobbyModule} from './pages/lobby/lobby.module';
+import {WaitLobbyModule} from './pages/wait-lobby/wait-lobby.module';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import {LobbyModule} from './pages/lobby/lobby.module';
     AppRoutingModule,
     NewGameModule,
     LobbyModule,
+    WaitLobbyModule,
     NgbModule
   ],
   providers: [],

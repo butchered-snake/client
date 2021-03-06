@@ -1,0 +1,16 @@
+<nb-card>
+  <nb-card-header>
+    Enter your game code and choose a name
+  </nb-card-header>
+  <nb-card-body>
+    <div>
+      <input #code nbInput placeholder="Game code">
+    </div>
+    <div class="mt-4">
+      <input #name (keyup.enter)="close(name.value, code.value)" nbInput placeholder="Name">
+    </div>
+  </nb-card-body>
+  <nb-card-footer>
+    <button (click)="close(name.value, code.value)" nbButton status="success">Confirm</button>
+  </nb-card-footer>
+</nb-card>

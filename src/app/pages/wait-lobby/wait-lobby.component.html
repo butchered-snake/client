@@ -1,0 +1,22 @@
+<nb-layout>
+  <nb-layout-header>
+    <button [routerLink]="'/new-game'" ghost nbButton size="giant">
+      <nb-icon icon="home-outline" size="giant"></nb-icon>
+      Home
+    </button>
+  </nb-layout-header>
+
+  <nb-layout-column [nbSpinner]="true" class="text-center" nbSpinnerSize="giant" nbSpinnerStatus="primary">
+    <nb-card>
+      <nb-card-body>
+        <div>
+          Hey {{this.name}}
+        </div>
+        <div>
+          Waiting for the game to start
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+  </nb-layout-column>
+</nb-layout>
