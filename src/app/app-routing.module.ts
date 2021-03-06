@@ -5,7 +5,7 @@ import {NewGameComponent} from './pages/new-game/new-game.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'new-game', pathMatch: 'full'},
-  {path: 'new-game', component: NewGameComponent}
+  {path: 'new-game', component: NewGameComponent},
 ];
 
 @NgModule({

@@ -3,7 +3,7 @@
     Select you name
   </nb-card-header>
   <nb-card-body>
-    <input #name nbInput>
+    <input #name (keyup.enter)="close(name.value)" nbInput>
   </nb-card-body>
   <nb-card-footer>
     <button (click)="close(name.value)" nbButton status="success">Confirm</button>
