@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {PlayerService} from '../../../common/services/player.service';
+import {ClientConnectionService} from '../../../common/services/client-connection.service';
 
 @Component({
   selector: 'app-wait-lobby',
@@ -8,7 +8,7 @@ import {PlayerService} from '../../../common/services/player.service';
 })
 export class WaitLobbyComponent implements OnInit {
 
-  constructor(public playerService: PlayerService) {
+  constructor(public clientConnectionService: ClientConnectionService) {
   }
 
   ngOnInit(): void {

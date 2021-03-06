@@ -13,7 +13,7 @@ export abstract class RTCClient {
     this.setUpDataChannel();
 
     this.peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-      console.log('ice sdp: ' + JSON.stringify(this.peerConnection.localDescription));
+      console.log('New ice candidate on local connection');
       if (this.peerConnection.localDescription) {
         this._newIceCandidate.next(this.peerConnection.localDescription);
       }

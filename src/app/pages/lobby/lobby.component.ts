@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {PlayerService} from '../../../common/services/player.service';
+import {AdminClientConnectionService} from '../../../common/services/admin-client-connection.service';
 
 @Component({
   selector: 'app-lobby',
@@ -8,7 +8,7 @@ import {PlayerService} from '../../../common/services/player.service';
 })
 export class LobbyComponent implements OnInit {
 
-  constructor(public playerService: PlayerService) {
+  constructor(public adminClientConnectionService: AdminClientConnectionService) {
   }
 
   ngOnInit(): void {

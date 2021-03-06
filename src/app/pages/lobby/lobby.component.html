@@ -8,7 +8,7 @@
 
   <nb-layout-column class="text-center">
 
-    <nb-card *ngIf="this.playerService.name === ''" class="text-center">
+    <nb-card *ngIf="this.adminClientConnectionService.name === ''" class="text-center">
       <nb-card-header>
         Hey that's illegal
       </nb-card-header>
@@ -18,14 +18,19 @@
     </nb-card>
 
 
-    <nb-card *ngIf="this.playerService.name !== ''" class="text-center">
+    <nb-card *ngIf="this.adminClientConnectionService.name !== ''" class="text-center">
       <nb-card-header>
-        Hey {{this.playerService.name}}, we are waiting for your friends
+        Hey {{this.adminClientConnectionService.name}}, we are waiting for your friends
       </nb-card-header>
       <nb-card-body>
-        Currently connected:
         <div>
-
+          Send them this code: {{this.adminClientConnectionService.code}}
+        </div>
+        Currently connected:
+        <div *ngFor="let connection of this.adminClientConnectionService.peerConnections | keyvalue">
+          <div>
+            {{connection.key}}
+          </div>
         </div>
       </nb-card-body>
     </nb-card>
