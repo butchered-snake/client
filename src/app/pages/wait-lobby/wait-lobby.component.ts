@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {PlayerService} from '../../../common/services/player.service';
 
 @Component({
   selector: 'app-wait-lobby',
@@ -8,16 +8,9 @@ import {ActivatedRoute} from '@angular/router';
 })
 export class WaitLobbyComponent implements OnInit {
 
-  public name: string = '';
-  public code: string = '';
-
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(public playerService: PlayerService) {
   }
 
   ngOnInit(): void {
-    this.activatedRoute.queryParams.subscribe(params => {
-      this.name = params.name;
-      this.code = params.code;
-    });
   }
 }
