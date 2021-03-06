@@ -1,0 +1,11 @@
+<nb-card>
+  <nb-card-header>
+    Select you name
+  </nb-card-header>
+  <nb-card-body>
+    <input #name nbInput>
+  </nb-card-body>
+  <nb-card-footer>
+    <button (click)="close(name.value)" nbButton status="success">Confirm</button>
+  </nb-card-footer>
+</nb-card>

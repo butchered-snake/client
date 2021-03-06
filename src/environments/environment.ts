@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  backendUrl: 'ws://debian-box:8080/create'
+  backendUrl: 'ws://debian-box:6969'
 };
 
 /*

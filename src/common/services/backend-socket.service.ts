@@ -23,7 +23,7 @@ export class BackendSocketService implements OnDestroy {
   }
 
   public requestNewGame(): void {
-    this.socket.emit('create');
+    this.socket.emit('create', 'doch', 'adadasd');
   }
 
   public sendOffer(offer: string): void {
