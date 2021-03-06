@@ -1,0 +1,32 @@
+<nb-layout *ngIf="name === undefined">
+  <nb-layout-column>
+
+    <nb-card class="text-center">
+      <nb-card-header>
+        Hey that's illegal
+      </nb-card-header>
+      <nb-card-body>
+        Go back to the <a [routerLink]="'/new-game'">main page</a>
+      </nb-card-body>
+    </nb-card>
+  </nb-layout-column>
+</nb-layout>
+
+
+<nb-layout>
+  <nb-layout-column>
+
+    <nb-card class="text-center">
+      <nb-card-header>
+        Hey {{this.name}}, we are waiting for your friends
+      </nb-card-header>
+      <nb-card-body>
+        Currently connected:
+        <div>
+
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+  </nb-layout-column>
+</nb-layout>

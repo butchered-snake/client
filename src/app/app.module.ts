@@ -8,6 +8,7 @@ import {NbEvaIconsModule} from '@nebular/eva-icons';
 import {AppRoutingModule} from './app-routing.module';
 import {NewGameModule} from './pages/new-game/new-game.module';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {LobbyModule} from './pages/lobby/lobby.module';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     NbEvaIconsModule,
     AppRoutingModule,
     NewGameModule,
+    LobbyModule,
     NgbModule
   ],
   providers: [],

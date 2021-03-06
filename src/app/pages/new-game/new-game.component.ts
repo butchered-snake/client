@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {NbDialogService} from '@nebular/theme';
 import {NewGameDialogComponent} from '../../../common/dialogs/new-game-dialog/new-game-dialog.component';
+import {Router} from '@angular/router';
 
 
 @Component({
@@ -10,15 +11,20 @@ import {NewGameDialogComponent} from '../../../common/dialogs/new-game-dialog/ne
 })
 export class NewGameComponent implements OnInit {
 
-  constructor(private dialogService: NbDialogService) {
+  constructor(private dialogService: NbDialogService, private router: Router) {
   }
 
   ngOnInit(): void {
   }
 
   public openNewGameDialog() {
-    this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(value => {
-      console.log(value);
+    this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(name => {
+      console.log(name);
+      this.router.navigate(['/lobby'], {
+        queryParams: {
+          name: name
+        }
+      }).then(value => console.log('Create new game'));
     });
   }
 
