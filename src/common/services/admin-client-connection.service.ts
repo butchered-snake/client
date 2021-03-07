@@ -4,6 +4,7 @@ import {LocalRTCClient} from '../model/local-rtc-client';
 import {Subject, Subscription} from 'rxjs';
 import {SocketEvents} from '../shared/socket-events.enum';
 import {AnswerEventData} from '../shared/types';
+import {LogService} from './log.service';
 
 @Injectable({
     providedIn: 'root'
@@ -19,8 +20,9 @@ export class AdminClientConnectionService {
     private isGameCreated: boolean = false;
     private alreadyGotOffer: boolean = false;
 
-    constructor(private backendSocketService: BackendSocketService) {
-        this.pendingConnection = new LocalRTCClient();
+    constructor(private logger: LogService,
+                private backendSocketService: BackendSocketService) {
+        this.pendingConnection = new LocalRTCClient(logger);
         this.currentICECandidateSubscription = this.pendingConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
         this.gameCreatedSubscription = this.backendSocketService.events.get(SocketEvents.GameCreated)!.subscribe(this.gameCreated.bind(this));
         this.answerSubscription = this.backendSocketService.events.get(SocketEvents.Answer)!.subscribe(this.gotAnswer.bind(this));
@@ -49,7 +51,7 @@ export class AdminClientConnectionService {
 
     public requestNewGame(): void {
         this.pendingConnection.createNewOffer();
-        console.log('Start a new game');
+        this.logger.info('start a new game');
     }
 
     private setUpPendingConnection(): void {
@@ -59,7 +61,7 @@ export class AdminClientConnectionService {
     private gotAnswer(args: AnswerEventData): void {
         this.pendingConnection.setAnswer(JSON.parse(args.answer));
         this.peerConnections.set(args.name, this.pendingConnection);
-        this.pendingConnection = new LocalRTCClient();
+        this.pendingConnection = new LocalRTCClient(this.logger);
         this.setUpPendingConnection();
         this.pendingConnection.createNewOffer();
         this.isGameCreated = true;
@@ -69,11 +71,11 @@ export class AdminClientConnectionService {
     private gameCreated(gameId: string): void {
         this.code = gameId;
         this.createdGame.next(gameId);
-        console.log(`New game created with id ${this.code}`);
+        this.logger.info(`new game created with id ${this.code}`);
     }
 
     private newIceCandidate(offer: RTCSessionDescription): void {
-        console.log(`Got new ice candidate. alreadyGotOffer is ${this.alreadyGotOffer}. isGameCreated is ${this.isGameCreated}`);
+        this.logger.debug(`got new ice candidate. alreadyGotOffer is ${this.alreadyGotOffer}. isGameCreated is ${this.isGameCreated}`);
         if (this.alreadyGotOffer) {
             return;
         }
