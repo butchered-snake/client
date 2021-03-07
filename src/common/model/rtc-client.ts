@@ -1,4 +1,5 @@
 import {Subject} from 'rxjs';
+import {LogService} from '../services/log.service';
 
 export abstract class RTCClient {
 
@@ -6,14 +7,14 @@ export abstract class RTCClient {
     protected dataChannel: RTCDataChannel | undefined;
     private readonly _newIceCandidate: Subject<RTCSessionDescription>;
 
-    protected constructor() {
+    protected constructor(private baseLogger: LogService) {
         this._newIceCandidate = new Subject<RTCSessionDescription>();
 
         this.peerConnection = new RTCPeerConnection();
         this.setUpDataChannel();
 
         this.peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-            console.log('New ice candidate on local connection');
+            this.baseLogger.debug('new ice candidate on local connection');
             if (this.peerConnection.localDescription) {
                 this._newIceCandidate.next(this.peerConnection.localDescription);
             }
@@ -35,6 +36,6 @@ export abstract class RTCClient {
     }
 
     protected handleDataChannelMessage(message: MessageEvent): void {
-        console.log('Message lol. ' + message);
+        this.baseLogger.debug('message received', message);
     }
 }

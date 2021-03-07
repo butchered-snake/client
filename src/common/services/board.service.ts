@@ -3,6 +3,7 @@ import {BoardCellState} from '../shared/board-cell-state.enum';
 import {Position} from '../shared/types';
 import {Direction} from '../shared/direction.enum';
 import {environment} from '../../environments/environment';
+import {LogService} from './log.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,7 @@ export class BoardService {
     public grid: BoardCellState[][] = [];
     public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
 
-    constructor() {
+    constructor(private logger: LogService) {
         for (let i = 0; i < environment.boardSize; i++) {
             this.grid[i] = [];
             for (let j = 0; j < environment.boardSize; j++) {

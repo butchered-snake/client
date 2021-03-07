@@ -3,6 +3,7 @@ import {BackendSocketService} from './backend-socket.service';
 import {Subscription} from 'rxjs';
 import {SocketEvents} from '../shared/socket-events.enum';
 import {RemoteRTCClient} from '../model/remote-rtc-client';
+import {LogService} from './log.service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,8 +15,9 @@ export class ClientConnectionService {
     private offerSubscription: Subscription;
     private createdAnswer = false;
 
-    constructor(private backendSocketService: BackendSocketService) {
-        this.peerConnection = new RemoteRTCClient();
+    constructor(private logger: LogService,
+                private backendSocketService: BackendSocketService) {
+        this.peerConnection = new RemoteRTCClient(logger);
         this.offerSubscription = this.backendSocketService.events.get(SocketEvents.Offer)!.subscribe(this.gotOffer.bind(this));
         this.currentICECandidateSubscription = this.peerConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
     }
@@ -55,7 +57,7 @@ export class ClientConnectionService {
 
     private gotOffer(offer: string): void {
         this.peerConnection.setOffer(JSON.parse(offer)).then(event => {
-            console.log('Offer set successfully');
+            this.logger.debug('offer set successfully');
             this.peerConnection.createNewAnswer();
         });
     }
