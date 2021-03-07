@@ -11,7 +11,6 @@ import {faCarrot} from '@fortawesome/free-solid-svg-icons';
 export class GameComponent implements OnInit {
 
     public foodIcon = faCarrot;
-
     public boardCellState = BoardCellState;
 
     constructor(public boardService: BoardService) {
