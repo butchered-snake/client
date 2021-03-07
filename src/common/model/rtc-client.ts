@@ -1,6 +1,6 @@
 import {Subject} from 'rxjs';
 import {LogService} from '../services/log.service';
-import {Event} from '../model/event';
+import {Event} from './event';
 
 export abstract class RTCClient {
 
@@ -24,7 +24,7 @@ export abstract class RTCClient {
         };
         this.onEvent = (event: Event) => {
             this.baseLogger.debug(JSON.stringify(event));
-        }
+        };
     }
 
     get newIceCandidate(): Subject<RTCSessionDescription> {
@@ -33,12 +33,12 @@ export abstract class RTCClient {
 
     abstract setUpDataChannel(): void;
 
-    public sendMessage(message: string): void {
+    public sendMessage(message: Event): void {
         if (!this.dataChannel) {
             return;
         }
 
-        this.dataChannel.send(message);
+        this.dataChannel.send(JSON.stringify(message));
     }
 
     setOnEventCallback(fn: (event: Event) => void) {
@@ -49,4 +49,5 @@ export abstract class RTCClient {
         const json = JSON.parse(message.data);
         this.onEvent(json as Event);
     }
+
 }
