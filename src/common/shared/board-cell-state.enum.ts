@@ -9,4 +9,3 @@ export enum BoardCellState {
     HeadIndicator,
     Neighbor
 }
-

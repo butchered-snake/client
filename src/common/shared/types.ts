@@ -1,10 +1,11 @@
 export interface AnswerEventData {
-  name: string,
-  answer: string
+    name: string,
+    answer: string
 }
 
-export interface Coordinates {
+export interface Position {
     x: number,
     y: number
 }
+
 

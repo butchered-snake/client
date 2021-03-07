@@ -6,15 +6,16 @@ import {LobbyComponent} from './pages/lobby/lobby.component';
 import {WaitLobbyComponent} from './pages/wait-lobby/wait-lobby.component';
 
 const routes: Routes = [
-  {path: '', redirectTo: 'new-game', pathMatch: 'full'},
-  {path: 'new-game', component: NewGameComponent},
-  {path: 'lobby', component: LobbyComponent},
-  {path: 'wait-lobby', component: WaitLobbyComponent},
+    {path: '', redirectTo: 'new-game', pathMatch: 'full'},
+    {path: 'new-game', component: NewGameComponent},
+    {path: 'lobby', component: LobbyComponent},
+    {path: 'wait-lobby', component: WaitLobbyComponent},
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule],
 })
 export class AppRoutingModule {
 }
+

@@ -12,23 +12,23 @@ import {LobbyModule} from './pages/lobby/lobby.module';
 import {WaitLobbyModule} from './pages/wait-lobby/wait-lobby.module';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    NbThemeModule.forRoot({name: 'corporate'}),
-    NbDialogModule.forRoot(),
-    NbEvaIconsModule,
-    AppRoutingModule,
-    NewGameModule,
-    LobbyModule,
-    WaitLobbyModule,
-    NgbModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        NbThemeModule.forRoot({name: 'corporate'}),
+        NbDialogModule.forRoot(),
+        NbEvaIconsModule,
+        AppRoutingModule,
+        NewGameModule,
+        LobbyModule,
+        WaitLobbyModule,
+        NgbModule
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

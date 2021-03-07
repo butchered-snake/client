@@ -8,43 +8,43 @@ import {ClientConnectionService} from '../../../common/services/client-connectio
 
 
 @Component({
-  selector: 'app-new-game',
-  templateUrl: './new-game.component.html',
-  styleUrls: ['./new-game.component.css']
+    selector: 'app-new-game',
+    templateUrl: './new-game.component.html',
+    styleUrls: ['./new-game.component.css']
 })
 export class NewGameComponent implements OnInit {
 
-  constructor(private dialogService: NbDialogService, private router: Router,
-              private adminClientConnectionService: AdminClientConnectionService,
-              private clientConnectionService: ClientConnectionService) {
-  }
+    constructor(private dialogService: NbDialogService, private router: Router,
+                private adminClientConnectionService: AdminClientConnectionService,
+                private clientConnectionService: ClientConnectionService) {
+    }
 
-  ngOnInit(): void {
-  }
+    ngOnInit(): void {
+    }
 
-  public openNewGameDialog() {
-    this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(name => {
-      console.log(name);
-      this.router.navigate(['/lobby'], {
-        queryParams: {
-          name: name,
-        }
-      }).then(value => {
-        this.adminClientConnectionService.name = name;
-        this.adminClientConnectionService.requestNewGame();
-      });
-    });
-  }
+    public openNewGameDialog() {
+        this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(name => {
+            console.log(name);
+            this.router.navigate(['/lobby'], {
+                queryParams: {
+                    name: name,
+                }
+            }).then(value => {
+                this.adminClientConnectionService.name = name;
+                this.adminClientConnectionService.requestNewGame();
+            });
+        });
+    }
 
-  public openJoinGameDialog() {
-    this.dialogService.open(JoinGameDialogComponent, {}).onClose.subscribe(args => {
-      this.router.navigate(['/wait-lobby'], {}).then(value => {
-        this.clientConnectionService.name = args.name;
-        this.clientConnectionService.code = args.code;
-        this.clientConnectionService.joinGame();
-        console.log('Join game');
-      });
-    });
-  }
+    public openJoinGameDialog() {
+        this.dialogService.open(JoinGameDialogComponent, {}).onClose.subscribe(args => {
+            this.router.navigate(['/wait-lobby'], {}).then(value => {
+                this.clientConnectionService.name = args.name;
+                this.clientConnectionService.code = args.code;
+                this.clientConnectionService.joinGame();
+                console.log('Join game');
+            });
+        });
+    }
 
 }

@@ -1,5 +1,6 @@
 export enum SocketEvents {
-  Offer,
-  GameCreated,
-  Answer
+    Offer,
+    GameCreated,
+    Answer
 }
+

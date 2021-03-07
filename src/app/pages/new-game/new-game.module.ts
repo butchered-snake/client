@@ -6,17 +6,17 @@ import {DialogModule} from '../../../common/dialogs/dialog.module';
 
 
 @NgModule({
-  declarations: [NewGameComponent],
-  imports: [
-    CommonModule,
-    NbCardModule,
-    NbButtonModule,
-    NbLayoutModule,
-    DialogModule,
-  ],
-  exports: [
-    NewGameComponent
-  ]
+    declarations: [NewGameComponent],
+    imports: [
+        CommonModule,
+        NbCardModule,
+        NbButtonModule,
+        NbLayoutModule,
+        DialogModule,
+    ],
+    exports: [
+        NewGameComponent
+    ]
 })
 export class NewGameModule {
 }

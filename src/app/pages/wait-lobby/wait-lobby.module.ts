@@ -6,16 +6,17 @@ import {RouterModule} from '@angular/router';
 
 
 @NgModule({
-  declarations: [WaitLobbyComponent],
-  imports: [
-    CommonModule,
-    NbLayoutModule,
-    RouterModule,
-    NbButtonModule,
-    NbIconModule,
-    NbSpinnerModule,
-    NbCardModule
-  ]
+    declarations: [WaitLobbyComponent],
+    imports: [
+        CommonModule,
+        NbLayoutModule,
+        RouterModule,
+        NbButtonModule,
+        NbIconModule,
+        NbSpinnerModule,
+        NbCardModule
+    ]
 })
 export class WaitLobbyModule {
 }
+

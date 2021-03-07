@@ -1,4 +1,4 @@
-import { Coordinates } from '../shared/types'
+import {Position} from '../shared/types';
 
 export class ClientId {
     private id: number;
@@ -7,14 +7,15 @@ export class ClientId {
         this.id = id;
     }
 
-    static fromCoordinates(coords: Coordinates): ClientId {
+    static fromCoordinates(coords: Position): ClientId {
         return new ClientId((coords.x << 16) | coords.y);
     }
 
-    getCoordinates(): Coordinates {
+    getCoordinates(): Position {
         return {
             x: this.id >>> 16,
             y: this.id & 0b1111111111111111
-        }
+        };
     }
 }
+
