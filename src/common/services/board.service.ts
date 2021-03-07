@@ -10,7 +10,7 @@ import {environment} from '../../environments/environment';
 export class BoardService {
 
     public grid: BoardCellState[][] = [];
-    private neighbourNames: Map<Direction, string> = new Map<Direction, string>();
+    public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
 
     constructor() {
         for (let i = 0; i < environment.boardSize; i++) {
