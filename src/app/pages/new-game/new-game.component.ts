@@ -28,16 +28,13 @@ export class NewGameComponent implements OnInit {
     public openNewGameDialog() {
         this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(name => {
             console.log(name);
-            this.router.navigate(['/lobby'], {
-                queryParams: {
-                    name: name,
-                }
-            }).then(value => {
+            this.router.navigate(['/lobby'], {}).then(value => {
                 this.adminClientConnectionService.name = name;
                 this.adminClientConnectionService.requestNewGame();
+                this.createOwnConnection();
             });
         });
-        this.createOwnConnection();
+
     }
 
     public openJoinGameDialog() {
