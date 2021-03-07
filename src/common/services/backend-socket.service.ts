@@ -3,6 +3,7 @@ import {environment} from '../../environments/environment';
 import {io, Socket} from 'socket.io-client';
 import {SocketEvents} from '../shared/socket-events.enum';
 import {Subject} from 'rxjs';
+import {LogService} from './log.service';
 
 
 @Injectable({
@@ -13,16 +14,16 @@ export class BackendSocketService implements OnDestroy {
     public events: Map<SocketEvents, Subject<any>> = new Map<SocketEvents, Subject<any>>();
     private socket: Socket;
 
-    constructor() {
+    constructor(private logger: LogService) {
         this.setUpSubjects();
         this.socket = io(environment.backendUrl);
 
         this.socket.on('connect', () => {
-            console.log(this.socket.id);
+            this.logger.debug('socket connected', this.socket.id);
         });
 
         this.socket.on('disconnect', () => {
-            console.log(this.socket.id);
+            this.logger.debug('socket disconnected', this.socket.id);
         });
 
         this.socket.on('gameCreated', (gameId: string) => {

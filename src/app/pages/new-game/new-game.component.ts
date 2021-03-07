@@ -5,7 +5,7 @@ import {Router} from '@angular/router';
 import {JoinGameDialogComponent} from '../../../common/dialogs/join-game-dialog/join-game-dialog.component';
 import {AdminClientConnectionService} from '../../../common/services/admin-client-connection.service';
 import {ClientConnectionService} from '../../../common/services/client-connection.service';
-
+import {LogService} from '../../../common/services/log.service';
 
 @Component({
     selector: 'app-new-game',
@@ -14,7 +14,8 @@ import {ClientConnectionService} from '../../../common/services/client-connectio
 })
 export class NewGameComponent implements OnInit {
 
-    constructor(private dialogService: NbDialogService, private router: Router,
+    constructor(private logger: LogService,
+                private dialogService: NbDialogService, private router: Router,
                 private adminClientConnectionService: AdminClientConnectionService,
                 private clientConnectionService: ClientConnectionService) {
     }
@@ -42,7 +43,7 @@ export class NewGameComponent implements OnInit {
                 this.clientConnectionService.name = args.name;
                 this.clientConnectionService.code = args.code;
                 this.clientConnectionService.joinGame();
-                console.log('Join game');
+                this.logger.info('join game');
             });
         });
     }
