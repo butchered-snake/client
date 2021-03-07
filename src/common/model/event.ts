@@ -7,6 +7,8 @@ export class Event {
 
     static New(type: EventType, ...args: any[]): Event {
         switch(type) {
+            case EventType.StartGame:
+                return new (StartGame as EventConstructor<StartGame>)(...args);
             case EventType.RequestOffer:
                 return new (RequestOffer as EventConstructor<RequestOffer>)(...args);
             case EventType.SetClientId:
