@@ -11,13 +11,17 @@ import {LogService} from './log.service';
 export class BoardService {
 
     public grid: BoardCellState[][] = [];
-    private neighbourNames: Map<Direction, string> = new Map<Direction, string>();
+    public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
 
     constructor(private logger: LogService) {
         for (let i = 0; i < environment.boardSize; i++) {
-            this.grid.push([]);
+            this.grid[i] = [];
             for (let j = 0; j < environment.boardSize; j++) {
-                this.grid[i].push(BoardCellState.Free);
+                if (i === 0 || i === environment.boardSize - 1 || j === 0 || j === environment.boardSize - 1) {
+                    this.grid[i][j] = BoardCellState.Wall;
+                } else {
+                    this.grid[i][j] = BoardCellState.Free;
+                }
             }
         }
     }
@@ -70,5 +74,100 @@ export class BoardService {
 
     set foodIndicator(value: Position | null) {
         this._foodIndicator = value;
+    }
+
+    public addNeighbour(direction: Direction, name: string) {
+        const positions: Position[] = [];
+        const state = BoardCellState.Neighbor;
+        const {min, max} = this.findMinMaxNeighbourValues(direction);
+
+        switch (direction) {
+            case Direction.North:
+                for (let i = min; i < max; i++) {
+                    positions.push({
+                        x: i,
+                        y: 0
+                    });
+                }
+                break;
+            case Direction.East:
+                for (let i = min; i < max; i++) {
+                    positions.push({
+                        x: environment.boardSize - 1,
+                        y: i
+                    });
+                }
+                break;
+            case Direction.South:
+                for (let i = min; i < max; i++) {
+                    positions.push({
+                        x: i,
+                        y: environment.boardSize - 1
+                    });
+                }
+                break;
+            case Direction.West:
+                for (let i = min; i < max; i++) {
+                    positions.push({
+                        x: 0,
+                        y: i
+                    });
+                }
+                break;
+        }
+        this.changeGridCells(positions, state);
+
+        console.log(`Add neighbour in ${Direction[direction]}. Positions: ${JSON.stringify(positions)}. min: ${min}. max: ${max}`);
+
+        this.neighbourNames.set(direction, name);
+    }
+
+    private findMinMaxNeighbourValues(direction: Direction): { min: number, max: number } {
+        const boundaries = {
+            min: 1,
+            max: environment.boardSize - 1
+        };
+
+        switch (direction) {
+            case Direction.North:
+                if (this.neighbourNames.has(Direction.West)) {
+                    boundaries.min = 0;
+                }
+                if (this.neighbourNames.has(Direction.East)) {
+                    boundaries.max = environment.boardSize;
+                }
+                break;
+            case Direction.East:
+                if (this.neighbourNames.has(Direction.North)) {
+                    boundaries.min = 0;
+                }
+                if (this.neighbourNames.has(Direction.South)) {
+                    boundaries.max = environment.boardSize;
+                }
+                break;
+            case Direction.South:
+                if (this.neighbourNames.has(Direction.West)) {
+                    boundaries.min = 0;
+                }
+                if (this.neighbourNames.has(Direction.East)) {
+                    boundaries.max = environment.boardSize;
+                }
+                break;
+            case Direction.West:
+                if (this.neighbourNames.has(Direction.North)) {
+                    boundaries.min = 0;
+                }
+                if (this.neighbourNames.has(Direction.South)) {
+                    boundaries.max = environment.boardSize;
+                }
+                break;
+        }
+        return boundaries;
+    }
+
+    private changeGridCells(positions: Position[], cellState: BoardCellState): void {
+        positions.forEach(position => {
+            this.grid[position.y][position.x] = cellState;
+        });
     }
 }
