@@ -8,4 +8,3 @@ export interface Position {
     y: number
 }
 
-
