@@ -11,7 +11,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {LobbyModule} from './pages/lobby/lobby.module';
 import {WaitLobbyModule} from './pages/wait-lobby/wait-lobby.module';
 import {GameModule} from './pages/game/game.module';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 
 @NgModule({
     declarations: [
@@ -20,7 +20,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
-        NbThemeModule.forRoot({name: 'corporate'}),
+        NbThemeModule.forRoot({name: 'dark'}),
         NbDialogModule.forRoot(),
         NbEvaIconsModule,
         AppRoutingModule,
