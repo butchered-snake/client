@@ -3,7 +3,6 @@ import {LogService} from '../services/log.service';
 
 export class RemoteRTCClient extends RTCClient {
 
-
     constructor(private logger: LogService) {
         super(logger);
     }
@@ -12,7 +11,10 @@ export class RemoteRTCClient extends RTCClient {
         this.peerConnection.ondatachannel = (event: RTCDataChannelEvent) => {
             this.dataChannel = event.channel;
             this.dataChannel.onmessage = this.handleDataChannelMessage.bind(this);
-            this.dataChannel.onopen = (event: Event) => this.logger.debug('data channel opened');
+            this.dataChannel.onopen = (event: Event) => {
+                this.logger.debug('data channel opened');
+                this.connectionEstablished.next();
+            };
         };
     }
 

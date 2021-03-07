@@ -4,22 +4,26 @@ import {Subscription} from 'rxjs';
 import {SocketEvents} from '../shared/socket-events.enum';
 import {RemoteRTCClient} from '../model/remote-rtc-client';
 import {LogService} from './log.service';
+import {ClientService} from './client.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClientConnectionService {
 
+    public peerConnection: RemoteRTCClient;
     private currentICECandidateSubscription: Subscription;
-    private peerConnection: RemoteRTCClient;
     private offerSubscription: Subscription;
     private createdAnswer = false;
 
-    constructor(private logger: LogService,
-                private backendSocketService: BackendSocketService) {
+    constructor(private logger: LogService, private backendSocketService: BackendSocketService, private clientService: ClientService) {
         this.peerConnection = new RemoteRTCClient(logger);
         this.offerSubscription = this.backendSocketService.events.get(SocketEvents.Offer)!.subscribe(this.gotOffer.bind(this));
         this.currentICECandidateSubscription = this.peerConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
+
+        this.peerConnection.connectionEstablished.subscribe(value => {
+            this.clientService.initializeService(this.peerConnection, this.name);
+        });
     }
 
     private _code: string = '';
@@ -46,7 +50,9 @@ export class ClientConnectionService {
         this.backendSocketService.joinGame(this.code);
     }
 
-    public setPeerConnection(connection: RemoteRTCClient) {
+    public setPeerConnection(connection: RemoteRTCClient, name: string) {
+        connection.connectionEstablished = this.peerConnection.connectionEstablished;
+        this.name = name;
         this.peerConnection = connection;
     }
 

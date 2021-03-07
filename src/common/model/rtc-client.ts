@@ -3,13 +3,14 @@ import {LogService} from '../services/log.service';
 
 export abstract class RTCClient {
 
+    public connectionEstablished: Subject<void>;
     protected peerConnection: RTCPeerConnection;
     protected dataChannel: RTCDataChannel | undefined;
     private readonly _newIceCandidate: Subject<RTCSessionDescription>;
 
     protected constructor(private baseLogger: LogService) {
+        this.connectionEstablished = new Subject<void>();
         this._newIceCandidate = new Subject<RTCSessionDescription>();
-
         this.peerConnection = new RTCPeerConnection();
         this.setUpDataChannel();
 

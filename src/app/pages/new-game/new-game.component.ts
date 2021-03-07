@@ -74,7 +74,7 @@ export class NewGameComponent implements OnInit {
         local.createNewOffer();
 
         this.adminClientConnectionService.addPeerConnection(local);
-        this.clientConnectionService.setPeerConnection(remote);
+        this.clientConnectionService.setPeerConnection(remote, this.adminClientConnectionService.name);
     }
 
 }
