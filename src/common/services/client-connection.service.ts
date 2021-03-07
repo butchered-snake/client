@@ -46,6 +46,10 @@ export class ClientConnectionService {
         this.backendSocketService.joinGame(this.code);
     }
 
+    public setPeerConnection(connection: RemoteRTCClient) {
+        this.peerConnection = connection;
+    }
+
     private newIceCandidate(answer: RTCSessionDescription): void {
         if (this.createdAnswer) {
             return;
