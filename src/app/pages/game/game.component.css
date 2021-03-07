@@ -1,0 +1,25 @@
+.container {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center
+}
+
+.item {
+    flex: 0 0 auto;
+    margin: 1px;
+    width: 25px;
+    height: 25px;
+}
+
+.center-icon {
+    float: left;
+    line-height: 25px;
+    text-align: center;
+    vertical-align: bottom;
+}
+
+.low-opacity {
+    opacity: 0.5;
+}
