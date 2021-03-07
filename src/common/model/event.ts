@@ -58,13 +58,13 @@ export class SetClientId extends AdminEvent {
 }
 
 export class ProvideOffer extends AdminEvent {
-    constructor(public from: number, public to: number, public offer: string) {
+    constructor(public from: number, public fromName: string, public to: number, public offer: string) {
         super(EventType.ProvideOffer);
     }
 }
 
 export class ProvideAnswer extends AdminEvent {
-    constructor(public from: number, public fromName: string, public to: number, answer: string) {
+    constructor(public from: number, public to: number, answer: string) {
         super(EventType.ProvideAnswer);
     }
 }
