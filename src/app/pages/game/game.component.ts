@@ -4,6 +4,7 @@ import {BoardCellState} from '../../../common/shared/board-cell-state.enum';
 import {faCarrot} from '@fortawesome/free-solid-svg-icons';
 import {Direction} from '../../../common/shared/direction.enum';
 import {AdminClientService} from '../../../common/services/admin-client.service';
+import {ClientService} from '../../../common/services/client.service';
 
 @Component({
     selector: 'app-game',
@@ -16,7 +17,7 @@ export class GameComponent implements OnInit {
     public boardCellState = BoardCellState;
     public direction = Direction;
 
-    constructor(public boardService: BoardService, private adminClient: AdminClientService) {
+    constructor(public boardService: BoardService, private adminClient: AdminClientService, public clientService: ClientService) {
     }
 
     ngOnInit(): void {

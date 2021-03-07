@@ -12,10 +12,10 @@ import {RemoteRTCClient} from '../model/remote-rtc-client';
     providedIn: 'root'
 })
 export class ClientService {
+    public name: string = '';
     private id: ClientId;
     private neighbours: Map<Direction, Neighbour>;
     private adminConnection: RemoteRTCClient | null = null;
-    private name: string = '';
 
     constructor(private logger: LogService, private board: BoardService) {
         this.id = new ClientId(0);
