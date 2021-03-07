@@ -20,18 +20,20 @@ export class ClientService {
     constructor(private logger: LogService, private board: BoardService) {
         this.id = new ClientId(0);
         this.neighbours = new Map();
-        this.board.setEventCallback(this.processBoardEvent);
+        this.board.setEventCallback(this.processBoardEvent.bind(this));
     }
 
     public initializeService(connection: RemoteRTCClient, name: string) {
         this.adminConnection = connection;
         this.name = name;
 
+        this.adminConnection.setOnEventCallback(this.processAdminEvent.bind(this));
+
         this.logger.info('ClientService init', name);
     }
 
     addNeighbour(neighbourId: ClientId) {
-        this.neighbours.set(this.getNeighbourDirection(neighbourId), new Neighbour(this.logger, this.processNeighbourEvent));
+        this.neighbours.set(this.getNeighbourDirection(neighbourId), new Neighbour(this.logger, this.processNeighbourEvent.bind(this)));
     }
 
     processNeighbourEvent(event: Event) {
@@ -43,6 +45,10 @@ export class ClientService {
 
     processBoardEvent(event: Event) {
 
+    }
+
+    processAdminEvent(event: Event) {
+    
     }
 
     getNeighbourDirection(neighbourId: ClientId): Direction {

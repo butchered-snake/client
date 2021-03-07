@@ -37,8 +37,14 @@ export class AdminEvent extends Event {
     }
 }
 
+export class StartGame extends AdminEvent {
+    constructor() {
+        super(EventType.StartGame);
+    }
+}
+
 export class RequestOffer extends AdminEvent {
-    constructor(public from: number, fromName: string, public to: number) {
+    constructor(public from: number, public fromName: string, public to: number) {
         super(EventType.RequestOffer);
     }
 }
@@ -50,13 +56,13 @@ export class SetClientId extends AdminEvent {
 }
 
 export class ProvideOffer extends AdminEvent {
-    constructor(public from: number, public to: number, offer: string) {
+    constructor(public from: number, public to: number, public offer: string) {
         super(EventType.ProvideOffer);
     }
 }
 
 export class ProvideAnswer extends AdminEvent {
-    constructor(public from: number, fromName: string, public to: number, answer: string) {
+    constructor(public from: number, public fromName: string, public to: number, answer: string) {
         super(EventType.ProvideAnswer);
     }
 }

@@ -1,5 +1,6 @@
 import {Subject} from 'rxjs';
 import {LogService} from '../services/log.service';
+import {Event} from '../model/event';
 
 export abstract class RTCClient {
 
@@ -7,6 +8,7 @@ export abstract class RTCClient {
     protected peerConnection: RTCPeerConnection;
     protected dataChannel: RTCDataChannel | undefined;
     private readonly _newIceCandidate: Subject<RTCSessionDescription>;
+    private onEvent: (event: Event) => void;
 
     protected constructor(private baseLogger: LogService) {
         this.connectionEstablished = new Subject<void>();
@@ -20,6 +22,9 @@ export abstract class RTCClient {
                 this._newIceCandidate.next(this.peerConnection.localDescription);
             }
         };
+        this.onEvent = (event: Event) => {
+            this.baseLogger.debug(JSON.stringify(event));
+        }
     }
 
     get newIceCandidate(): Subject<RTCSessionDescription> {
@@ -36,7 +41,12 @@ export abstract class RTCClient {
         this.dataChannel.send(message);
     }
 
+    setOnEventCallback(fn: (event: Event) => void) {
+        this.onEvent = fn;
+    }
+
     protected handleDataChannelMessage(message: MessageEvent): void {
-        this.baseLogger.debug('message received', message);
+        const json = JSON.parse(message.data);
+        this.onEvent(json as Event);
     }
 }

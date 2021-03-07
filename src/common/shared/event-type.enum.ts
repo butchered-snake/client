@@ -3,6 +3,7 @@ export enum EventType {
 
     //admin
     FoodPosUpdate,
+    StartGame,
     RequestOffer,
     SetClientId,
     ProvideOffer,
