@@ -122,6 +122,12 @@ export class BoardService {
         this.neighbourNames.set(direction, name);
     }
 
+    public changeGridCells(positions: Position[], cellState: BoardCellState): void {
+        positions.forEach(position => {
+            this.grid[position.y][position.x] = cellState;
+        });
+    }
+
     private findMinMaxNeighbourValues(direction: Direction): { min: number, max: number } {
         const boundaries = {
             min: 1,
@@ -163,11 +169,5 @@ export class BoardService {
                 break;
         }
         return boundaries;
-    }
-
-    private changeGridCells(positions: Position[], cellState: BoardCellState): void {
-        positions.forEach(position => {
-            this.grid[position.y][position.x] = cellState;
-        });
     }
 }

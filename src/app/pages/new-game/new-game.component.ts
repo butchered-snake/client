@@ -6,6 +6,8 @@ import {JoinGameDialogComponent} from '../../../common/dialogs/join-game-dialog/
 import {AdminClientConnectionService} from '../../../common/services/admin-client-connection.service';
 import {ClientConnectionService} from '../../../common/services/client-connection.service';
 import {LogService} from '../../../common/services/log.service';
+import {LocalRTCClient} from '../../../common/model/local-rtc-client';
+import {RemoteRTCClient} from '../../../common/model/remote-rtc-client';
 
 @Component({
     selector: 'app-new-game',
@@ -26,15 +28,13 @@ export class NewGameComponent implements OnInit {
     public openNewGameDialog() {
         this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(name => {
             console.log(name);
-            this.router.navigate(['/lobby'], {
-                queryParams: {
-                    name: name,
-                }
-            }).then(value => {
+            this.router.navigate(['/lobby'], {}).then(value => {
                 this.adminClientConnectionService.name = name;
                 this.adminClientConnectionService.requestNewGame();
+                this.createOwnConnection();
             });
         });
+
     }
 
     public openJoinGameDialog() {
@@ -46,6 +46,35 @@ export class NewGameComponent implements OnInit {
                 this.logger.info('join game');
             });
         });
+    }
+
+    private createOwnConnection(): void {
+        const local = new LocalRTCClient(this.logger);
+        const remote = new RemoteRTCClient(this.logger);
+        let gotOffer = false;
+        let gotAnswer = false;
+
+        local.newIceCandidate.subscribe(offer => {
+            if (gotOffer) {
+                return;
+            }
+            remote.setOffer(offer).then(event => {
+                remote.createNewAnswer();
+            });
+            gotOffer = true;
+        });
+
+        remote.newIceCandidate.subscribe(answer => {
+            if (gotAnswer) {
+                return;
+            }
+            local.setAnswer(answer);
+            gotAnswer = true;
+        });
+        local.createNewOffer();
+
+        this.adminClientConnectionService.addPeerConnection(local);
+        this.clientConnectionService.setPeerConnection(remote);
     }
 
 }
