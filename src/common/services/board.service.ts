@@ -4,6 +4,7 @@ import {Position} from '../shared/types';
 import {Direction} from '../shared/direction.enum';
 import {environment} from '../../environments/environment';
 import {LogService} from './log.service';
+import {Event} from '../model/event';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +13,8 @@ export class BoardService {
 
     public grid: BoardCellState[][] = [];
     public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
+
+    private onEvent: (event: Event) => void;
 
     constructor(private logger: LogService) {
         for (let i = 0; i < environment.boardSize; i++) {
@@ -24,6 +27,11 @@ export class BoardService {
                 }
             }
         }
+        this.onEvent = (event: Event) => {this.logger.error("on event method not set yet")};
+    }
+
+    setEventCallback(fn: (event: Event) => void) {
+        this.onEvent = fn;
     }
 
     private _head: Position | null = null;
