@@ -14,5 +14,9 @@ export class LobbyComponent implements OnInit {
     ngOnInit(): void {
     }
 
+    public startGame(): void {
+        console.log('start game lol');
+    }
+
 }
 
