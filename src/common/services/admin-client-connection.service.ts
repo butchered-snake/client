@@ -54,6 +54,10 @@ export class AdminClientConnectionService {
         this.logger.info('start a new game');
     }
 
+    public addPeerConnection(connection: LocalRTCClient): void {
+        this.peerConnections.set(this.name, connection);
+    }
+
     private setUpPendingConnection(): void {
         this.currentICECandidateSubscription = this.pendingConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
     }
