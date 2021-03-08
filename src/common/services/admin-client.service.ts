@@ -223,6 +223,7 @@ export class AdminClientService {
         switch (event.type) {
             case EventType.ProvideOffer:
                 const provideOffer: ProvideOffer = (event as ProvideOffer);
+                provideOffer.fromName = this.idToName.get(provideOffer.from) ?? "";
                 this.connections.get(provideOffer.to)?.sendMessage(event);
                 break;
             case EventType.ProvideAnswer:
