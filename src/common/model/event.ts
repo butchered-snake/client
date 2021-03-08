@@ -6,10 +6,6 @@ export class Event {
     constructor(public type: EventType) {}
 }
 
-interface EventConstructor<T> {
-    new (...args: any[]): T;
-}
-
 // admin events
 export class AdminEvent extends Event {
     constructor(type: EventType) {
@@ -42,13 +38,13 @@ export class SetFood extends AdminEvent {
 }
 
 export class PlacedFood extends AdminEvent {
-    constructor(public newPos: Position, from: number) {
+    constructor(public newPos: Position, public from: number) {
         super(EventType.PlacedFood);
     }
 }
 
 export class FoodPosUpdate extends AdminEvent {
-    constructor(public newPos: Position, from: number) {
+    constructor(public newPos: Position, public from: number) {
         super(EventType.FoodPosUpdate);
     }
 }
