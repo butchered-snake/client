@@ -6,8 +6,9 @@ import {Position} from '../shared/types';
 import {BoardService} from './board.service';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {Router} from '@angular/router';
-import {Event, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId} from '../model/event';
+import {Event, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId, StartGame} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
+import {interval, Observable, Subscription} from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
@@ -19,10 +20,13 @@ export class AdminClientService {
     private pendingConnectionQueue: boolean[];
     private maxX: number = 0;
     private maxY: number = 0;
+    private pendingConnectionsSubscription: Subscription | undefined;
+    private connectionChecker: Observable<number>;
 
     constructor(private logger: LogService, private boardService: BoardService,
                 private adminClientConnectionService: AdminClientConnectionService, private router: Router) {
         this.pendingConnectionQueue = [];
+        this.connectionChecker = interval(1000);
     }
 
     public addConnections(): void {
@@ -134,6 +138,14 @@ export class AdminClientService {
 
         this.sendClientIdEvents();
         this.startClientHandshakes();
+
+        this.pendingConnectionsSubscription = this.connectionChecker.subscribe((value => {
+            this.logger.info(`Checking connection queue. ${this.pendingConnectionQueue.length} left`);
+            if (this.pendingConnectionQueue.length === 0) {
+                this.pendingConnectionsSubscription!.unsubscribe();
+                this.startGame();
+            }
+        }));
     }
 
     private sendClientIdEvents(): void {
@@ -194,6 +206,9 @@ export class AdminClientService {
 
     private startGame(): void {
         this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
+        this.connections.forEach((connection: LocalRTCClient, id: number) => {
+            connection.sendMessage(new StartGame());
+        });
     }
 
     private addConnectionToMap(position: Position, name: string, connection: LocalRTCClient): void {
