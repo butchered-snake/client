@@ -69,6 +69,11 @@ export class BoardService {
     }
 
     set headIndicator(value: Position | null) {
+        if (value) {
+            this.changeGridCells([value], BoardCellState.HeadIndicator);
+        } else {
+            this.changeGridCells([this.foodIndicator!], BoardCellState.Neighbor);
+        }
         this._headIndicator = value;
     }
 
@@ -79,6 +84,11 @@ export class BoardService {
     }
 
     set foodIndicator(value: Position | null) {
+        if (value) {
+            this.changeGridCells([value], BoardCellState.FoodIndicator);
+        } else {
+            this.changeGridCells([this.foodIndicator!], BoardCellState.Neighbor);
+        }
         this._foodIndicator = value;
     }
 

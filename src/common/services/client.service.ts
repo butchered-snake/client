@@ -1,6 +1,15 @@
 import {Injectable} from '@angular/core';
 import {LogService} from './log.service';
-import {Event, ConnectionEstablished, HeadPosUpdate, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId} from '../model/event';
+import {
+    ConnectionEstablished,
+    Event,
+    FoodPosUpdate,
+    HeadPosUpdate,
+    ProvideAnswer,
+    ProvideOffer,
+    RequestOffer,
+    SetClientId
+} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {ClientId} from '../model/client-id';
 import {Neighbour} from '../model/neighbour';
@@ -9,6 +18,8 @@ import {BoardService} from './board.service';
 import {RTCClient} from '../model/rtc-client';
 import {LocalRTCClient} from '../model/local-rtc-client';
 import {RemoteRTCClient} from '../model/remote-rtc-client';
+import {Position} from '../shared/types';
+import {environment} from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
@@ -42,7 +53,14 @@ export class ClientService {
     processNeighbourEvent(event: Event) {
         switch (event.type) {
             case EventType.HeadPosUpdate:
-                this.board.headIndicator = (event as HeadPosUpdate).newPos;
+                this.board.headIndicator = this.getNewHeadIndicatorPosition(event as HeadPosUpdate);
+                break;
+            case EventType.FoodPosUpdate:
+                if (this.board.food) {
+                    break;
+                }
+                this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
+                break;
         }
     }
 
@@ -110,21 +128,140 @@ export class ClientService {
         }
     }
 
+
     getNeighbourDirection(neighbourId: ClientId): Direction {
         const coords = this.id.getCoordinates();
         const neighbourCoords = neighbourId.getCoordinates();
-        if (coords.x < neighbourCoords.x) {
-            return Direction.East;
-        } else if (coords.x > neighbourCoords.x) {
-            return Direction.West;
+
+        const coordTransformDif = {
+            x: coords.x - 1,
+            y: coords.y - 1
+        };
+
+        const transformedNeighbourCoords = {
+            x: neighbourCoords.x - coordTransformDif.x,
+            y: neighbourCoords.y - coordTransformDif.y
+        };
+
+        switch (ClientId.fromCoordinates(transformedNeighbourCoords).id) {
+            case ClientId.fromCoordinates({x: 0, y: 0}).id:
+                return Direction.NorthWest;
+            case ClientId.fromCoordinates({x: 1, y: 0}).id:
+                return Direction.North;
+            case ClientId.fromCoordinates({x: 2, y: 0}).id:
+                return Direction.NorthEast;
+            case ClientId.fromCoordinates({x: 2, y: 1}).id:
+                return Direction.East;
+            case ClientId.fromCoordinates({x: 2, y: 2}).id:
+                return Direction.SouthEast;
+            case ClientId.fromCoordinates({x: 1, y: 2}).id:
+                return Direction.South;
+            case ClientId.fromCoordinates({x: 0, y: 2}).id:
+                return Direction.SouthWest;
+            case ClientId.fromCoordinates({x: 0, y: 1}).id:
+                return Direction.West;
         }
-        if (coords.y < neighbourCoords.y) {
-            return Direction.South;
-        } else if (coords.y > neighbourCoords.y) {
-            return Direction.North;
-        }
+
         this.logger.error('neighbour should not have same pos as client');
-        return Direction.NorthEast;
+        return 25;
+    }
+
+    private getNewFoodIndicatorPosition(event: FoodPosUpdate): Position {
+        let newPosition: Position = {
+            x: 0,
+            y: 0
+        };
+
+        const neighbourDirection = this.getNeighbourDirection(new ClientId(event.from));
+
+        switch (neighbourDirection) {
+            case Direction.NorthWest:
+                newPosition = {
+                    x: 0,
+                    y: 0
+                };
+                break;
+            case Direction.North:
+                newPosition = {
+                    x: event.newPos.x,
+                    y: 0
+                };
+                break;
+            case Direction.NorthEast:
+                newPosition = {
+                    x: environment.boardSize,
+                    y: 0
+                };
+                break;
+            case Direction.East:
+                newPosition = {
+                    x: environment.boardSize,
+                    y: event.newPos.y
+                };
+                break;
+            case Direction.SouthEast:
+                newPosition = {
+                    x: environment.boardSize,
+                    y: environment.boardSize
+                };
+                break;
+            case Direction.South:
+                newPosition = {
+                    x: event.newPos.x,
+                    y: environment.boardSize
+                };
+                break;
+            case Direction.SouthWest:
+                newPosition = {
+                    x: 0,
+                    y: environment.boardSize
+                };
+                break;
+            case Direction.West:
+                newPosition = {
+                    x: 0,
+                    y: event.newPos.y
+                };
+                break;
+        }
+
+        return newPosition;
+    }
+
+    private getNewHeadIndicatorPosition(event: HeadPosUpdate): Position {
+        let newPosition: Position = {
+            x: 0,
+            y: 0
+        };
+
+        switch (event.direction) {
+            case Direction.North:
+                newPosition = {
+                    x: event.newPos.x,
+                    y: environment.boardSize
+                };
+                break;
+            case Direction.East:
+                newPosition = {
+                    x: 0,
+                    y: event.newPos.y
+                };
+                break;
+            case Direction.South:
+                newPosition = {
+                    x: event.newPos.x,
+                    y: 0
+                };
+                break;
+            case Direction.West:
+                newPosition = {
+                    x: environment.boardSize,
+                    y: event.newPos.y
+                };
+                break;
+        }
+
+        return newPosition;
     }
 }
 
