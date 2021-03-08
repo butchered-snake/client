@@ -27,14 +27,10 @@ export class BoardService {
                 }
             }
         }
-        this.onEvent = (event: Event) => {this.logger.error("on event method not set yet")};
+        this.onEvent = (event: Event) => {
+            this.logger.error('on event method not set yet');
+        };
     }
-
-    setEventCallback(fn: (event: Event) => void) {
-        this.onEvent = fn;
-    }
-
-    tick() {}
 
     private _head: Position | null = null;
 
@@ -86,6 +82,13 @@ export class BoardService {
         this._foodIndicator = value;
     }
 
+    setEventCallback(fn: (event: Event) => void) {
+        this.onEvent = fn;
+    }
+
+    tick() {
+    }
+
     public addNeighbour(direction: Direction, name: string) {
         const positions: Position[] = [];
         const state = BoardCellState.Neighbor;
@@ -127,12 +130,12 @@ export class BoardService {
         }
         this.changeGridCells(positions, state);
 
-        console.log(`Add neighbour in ${Direction[direction]}. Positions: ${JSON.stringify(positions)}. min: ${min}. max: ${max}`);
-
+        this.logger.info(`Add neighbour ${name} in ${Direction[direction]}.`);
         this.neighbourNames.set(direction, name);
     }
 
     public changeGridCells(positions: Position[], cellState: BoardCellState): void {
+        this.logger.info(`Update positions ${JSON.stringify(positions)} with cell state ${BoardCellState[cellState]}`);
         positions.forEach(position => {
             this.grid[position.y][position.x] = cellState;
         });
