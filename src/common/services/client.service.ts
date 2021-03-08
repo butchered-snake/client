@@ -62,11 +62,13 @@ export class ClientService {
             switch (event.type) {
                 case EventType.HeadPosUpdate:
                     this.board.headIndicator = this.getNewHeadIndicatorPosition(event as HeadPosUpdate);
+                    this.board.foodIndicator = this.board.foodIndicator;
                     break;
                 case EventType.HeadEntering:
                     const headEntering: HeadEntering = (event as HeadEntering);
                     this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos, 'head');
                     this.board.headDirection = headEntering.direction;
+                    this.board.headIndicator = null;
                     break;
                 case EventType.TailEntering:
                     const tailEntering: TailEntering = (event as TailEntering);
@@ -96,7 +98,9 @@ export class ClientService {
                     break;
                 case EventType.HeadPosUpdate:
                     const headPosUpdate: HeadPosUpdate = (event as HeadPosUpdate);
-                    this.sendEventToNeighbour(headPosUpdate.direction, headPosUpdate);
+                    this.neighbours.forEach((connection: Neighbour, direction: Direction) => {
+                        connection.connection.sendMessage(new HeadPosUpdate(direction, headPosUpdate.newPos));
+                    });
                     break;
                 case EventType.StopGame:
                     this.adminConnection!.sendMessage(event);

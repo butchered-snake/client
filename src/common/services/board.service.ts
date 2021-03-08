@@ -4,7 +4,7 @@ import {Position} from '../shared/types';
 import {Direction} from '../shared/direction.enum';
 import {environment} from '../../environments/environment';
 import {LogService} from './log.service';
-import {Event, FoodEaten, HeadEntering, StopGame, TailEntering} from '../model/event';
+import {Event, FoodEaten, HeadEntering, HeadPosUpdate, StopGame, TailEntering} from '../model/event';
 
 @Injectable({
     providedIn: 'root'
@@ -84,6 +84,9 @@ export class BoardService {
 
     set headIndicator(value: Position | null) {
         if (value) {
+            if (this.headIndicator) {
+                this.changeGridCells([this.headIndicator], BoardCellState.Neighbor);
+            }
             this.changeGridCells([value], BoardCellState.HeadIndicator);
         } else {
             this.changeGridCells([this.headIndicator!], BoardCellState.Neighbor);
@@ -145,6 +148,7 @@ export class BoardService {
                 this.onEvent(event);
             } else {
                 this.head = newPosition;
+                this.onEvent(new HeadPosUpdate(99, newPosition));
             }
         }
 
@@ -157,7 +161,7 @@ export class BoardService {
                 const newPosition = this.getNewPosition(this.tail, direction);
                 this.changeGridCells([this.tail!], BoardCellState.Free);
                 const cellState = this.grid[newPosition.y][newPosition.x];
-                if (cellState === BoardCellState.Neighbor || cellState === BoardCellState.FoodIndicator) {
+                if (cellState === BoardCellState.Neighbor || cellState === BoardCellState.FoodIndicator || cellState === BoardCellState.HeadIndicator) {
                     this.onEvent(new TailEntering(direction, newPosition));
                     this.tail = null;
                 } else {
