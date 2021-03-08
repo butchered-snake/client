@@ -72,7 +72,7 @@ export class BoardService {
         if (value) {
             this.changeGridCells([value], BoardCellState.HeadIndicator);
         } else {
-            this.changeGridCells([this.foodIndicator!], BoardCellState.Neighbor);
+            this.changeGridCells([this.headIndicator!], BoardCellState.Neighbor);
         }
         this._headIndicator = value;
     }
