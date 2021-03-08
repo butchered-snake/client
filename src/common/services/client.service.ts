@@ -296,13 +296,13 @@ export class ClientService {
                 break;
             case Direction.NorthEast:
                 newPosition = {
-                    x: environment.boardSize,
+                    x: environment.boardSize - 1,
                     y: 0
                 };
                 break;
             case Direction.East:
                 newPosition = {
-                    x: environment.boardSize,
+                    x: environment.boardSize - 1,
                     y: event.newPos.y
                 };
                 break;
@@ -315,13 +315,13 @@ export class ClientService {
             case Direction.South:
                 newPosition = {
                     x: event.newPos.x,
-                    y: environment.boardSize
+                    y: environment.boardSize - 1
                 };
                 break;
             case Direction.SouthWest:
                 newPosition = {
                     x: 0,
-                    y: environment.boardSize
+                    y: environment.boardSize - 1
                 };
                 break;
             case Direction.West:
@@ -345,7 +345,7 @@ export class ClientService {
             case Direction.North:
                 newPosition = {
                     x: event.newPos.x,
-                    y: environment.boardSize
+                    y: environment.boardSize - 1
                 };
                 break;
             case Direction.East:
@@ -362,7 +362,7 @@ export class ClientService {
                 break;
             case Direction.West:
                 newPosition = {
-                    x: environment.boardSize,
+                    x: environment.boardSize - 1,
                     y: event.newPos.y
                 };
                 break;
