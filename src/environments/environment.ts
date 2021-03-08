@@ -6,7 +6,8 @@ export const environment = {
     production: false,
     backendUrl: 'ws://debian-box:6969',
     isAdmin: false,
-    boardSize: 18
+    boardSize: 18,
+    snakeSize: 3
 };
 
 /*

@@ -73,6 +73,12 @@ export class ClientService {
         let direction: Direction;
 
         switch (event.type) {
+            case EventType.Tick:
+                this.board.tick();
+                break;
+            case EventType.PlaceSnake:
+                this.board.setSnake();
+                break;
             case EventType.SetClientId:
                 const setClientId: SetClientId = (event as SetClientId);
                 this.id = new ClientId(setClientId.id);
