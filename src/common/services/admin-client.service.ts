@@ -6,7 +6,7 @@ import {Position} from '../shared/types';
 import {BoardService} from './board.service';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {Router} from '@angular/router';
-import {RequestOffer} from '../model/event';
+import {RequestOffer, SetClientId} from '../model/event';
 
 @Injectable({
     providedIn: 'root'
@@ -131,7 +131,14 @@ export class AdminClientService {
         this.maxY = maxY;
         this.logger.info(`maxX: ${maxX}, maxY: ${maxY}`);
 
+        this.sendClientIdEvents();
         this.startClientHandshakes();
+    }
+
+    private sendClientIdEvents(): void {
+        this.connections.forEach((connection: LocalRTCClient, id: number) => {
+            connection.sendMessage(new SetClientId(id));
+        });
     }
 
     private startClientHandshakes(): void {
