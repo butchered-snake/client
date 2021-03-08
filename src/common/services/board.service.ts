@@ -13,9 +13,8 @@ export class BoardService {
 
     public grid: BoardCellState[][] = [];
     public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
-    private moveQueue: Direction[] = [];
     public headDirection: Direction = Direction.West;
-
+    private moveQueue: Direction[] = [];
     private onEvent: (event: Event) => void;
 
     constructor(private logger: LogService) {
@@ -154,6 +153,7 @@ export class BoardService {
         };
 
         this.headDirection = Direction.West;
+        this.moveQueue.unshift(this.headDirection);
 
         for (let i = 0; i < environment.snakeSize - 2; i++) {
             this.changeGridCells([{
