@@ -127,6 +127,7 @@ export class ClientService {
                     break;
                 case EventType.FoodPosUpdate:
                     if (this.board.food) {
+                        this.board.foodIndicator = null;
                         break;
                     }
                     this.board.elongateTail();
@@ -273,7 +274,11 @@ export class ClientService {
         return newPosition;
     }
 
-    private getNewFoodIndicatorPosition(event: FoodPosUpdate): Position {
+    private getNewFoodIndicatorPosition(event: FoodPosUpdate): Position | null {
+        if (this.id.id === new ClientId(event.from).id) {
+            return null;
+        }
+
         let newPosition: Position = {
             x: 0,
             y: 0

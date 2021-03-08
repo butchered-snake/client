@@ -99,6 +99,9 @@ export class BoardService {
 
     set foodIndicator(value: Position | null) {
         if (value) {
+            if (this.foodIndicator) {
+                this.changeGridCells([this.foodIndicator], BoardCellState.Neighbor);
+            }
             this.changeGridCells([value], BoardCellState.FoodIndicator);
         } else {
             this.changeGridCells([this.foodIndicator!], BoardCellState.Neighbor);
@@ -120,7 +123,7 @@ export class BoardService {
         while (cellState != BoardCellState.Free) {
             x = Math.floor(Math.random() * (this.grid.length - 2)) + 1;
             y = Math.floor(Math.random() * (this.grid[x].length - 2)) + 1;
-            cellState = this.grid[x][y];
+            cellState = this.grid[y][x];
         }
         const ret: Position = {x: x, y: y};
         this.logger.debug('creating food', ret);
@@ -154,7 +157,7 @@ export class BoardService {
                 const newPosition = this.getNewPosition(this.tail, direction);
                 this.changeGridCells([this.tail!], BoardCellState.Free);
                 const cellState = this.grid[newPosition.y][newPosition.x];
-                if (cellState === BoardCellState.Neighbor) {
+                if (cellState === BoardCellState.Neighbor || cellState === BoardCellState.FoodIndicator) {
                     this.onEvent(new TailEntering(direction, newPosition));
                     this.tail = null;
                 } else {
@@ -262,6 +265,7 @@ export class BoardService {
             case BoardCellState.Wall:
                 return new StopGame(`Bonk`);
             case BoardCellState.Neighbor:
+            case BoardCellState.FoodIndicator:
                 this.head = null;
                 return new HeadEntering(this.headDirection, position);
             case BoardCellState.Food:
