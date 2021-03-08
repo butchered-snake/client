@@ -218,6 +218,7 @@ export class ClientService {
     }
 
     private getNewPosFromDirectionalPos(direction: Direction, oldPos: Position): Position {
+        this.logger.info(`head entered from direction ${Direction[direction]} with coords: ${JSON.stringify(oldPos)}`);
         let newPosition: Position = {
             x: 0,
             y: 0
@@ -227,24 +228,24 @@ export class ClientService {
             case Direction.North:
                 newPosition = {
                     x: oldPos.x,
-                    y: 0
+                    y: environment.boardSize - 1
                 };
                 break;
             case Direction.East:
                 newPosition = {
-                    x: environment.boardSize - 1,
+                    x: 1,
                     y: oldPos.y
                 };
                 break;
             case Direction.South:
                 newPosition = {
                     x: oldPos.x,
-                    y: environment.boardSize - 1
+                    y: 1
                 };
                 break;
             case Direction.West:
                 newPosition = {
-                    x: 0,
+                    x: environment.boardSize - 1,
                     y: oldPos.y
                 };
                 break;
