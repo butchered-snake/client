@@ -51,7 +51,6 @@ export class ClientService {
     }
 
     processAdminEvent(event: Event) {
-        this.logger.debug('received admin event', event);
         let neighbourId: ClientId;
         let direction: Direction;
 
@@ -66,11 +65,17 @@ export class ClientService {
                 neighbourId = new ClientId(requestOffer.from);
                 direction = this.getNeighbourDirection(neighbourId);
                 const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
-                localConnection.createNewOffer(((offer: RTCSessionDescriptionInit) => {
+                let gotOffer: boolean = false;
+                localConnection.newIceCandidate.subscribe(offer => {
+                    if (gotOffer) {
+                        return;
+                    }
                     this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id.id, '', neighbourId.id, JSON.stringify(offer)));
-                    this.addNeighbour(direction, neighbourId, localConnection);
-                    this.board.addNeighbour(direction, requestOffer.fromName);
-                }).bind(this));
+                    gotOffer = true;
+                });
+                localConnection.createNewOffer();
+                this.addNeighbour(direction, neighbourId, localConnection);
+                this.board.addNeighbour(direction, requestOffer.fromName);
                 break;
             case EventType.ProvideOffer:
                 const provideOffer: ProvideOffer = (event as ProvideOffer);
@@ -81,12 +86,19 @@ export class ClientService {
                     this.adminConnection?.sendMessage(Event.New(EventType.ConnectionEstablished));
                     remoteConnection.connectionEstablished.unsubscribe();
                 });
-                remoteConnection.setOffer(JSON.parse(provideOffer.offer));
-                remoteConnection.createNewAnswer(((answer: RTCSessionDescriptionInit) => {
+                let gotAnswer: boolean = false;
+                remoteConnection.newIceCandidate.subscribe((answer) => {
+                    if (gotAnswer) {
+                        return;
+                    }
                     this.adminConnection?.sendMessage(Event.New(EventType.ProvideAnswer, this.id.id, neighbourId.id, JSON.stringify(answer)));
-                    this.addNeighbour(direction, neighbourId, remoteConnection);
-                    this.board.addNeighbour(direction, provideOffer.fromName);
-                }).bind(this));
+                    gotAnswer = true;
+                });
+                remoteConnection.setOffer(JSON.parse(provideOffer.offer)).then((res) => {
+                    remoteConnection.createNewAnswer();
+                });
+                this.addNeighbour(direction, neighbourId, remoteConnection);
+                this.board.addNeighbour(direction, provideOffer.fromName);
                 break;
             case EventType.ProvideAnswer:
                 const provideAnswer: ProvideAnswer = (event as ProvideAnswer);

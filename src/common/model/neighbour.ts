@@ -4,7 +4,7 @@ import {ClientId} from './client-id';
 import {RTCClient} from './rtc-client';
 
 export class Neighbour {
-    constructor(private logger: LogService, private id: ClientId, private _connection: RTCClient, onEventCallback: (event: Event) => void) {
+    constructor(private logger: LogService, private id: ClientId, private _connection: RTCClient, private onEventCallback: (event: Event) => void) {
         this._connection.setOnEventCallback(onEventCallback);
     }
 

@@ -208,11 +208,11 @@ export class AdminClientService {
         switch (event.type) {
             case EventType.ProvideOffer:
                 const provideOffer: ProvideOffer = (event as ProvideOffer);
-                this.connections.get(provideOffer.from)?.sendMessage(event);
+                this.connections.get(provideOffer.to)?.sendMessage(event);
                 break;
             case EventType.ProvideAnswer:
                 const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
-                this.connections.get(provideAnswer.from)?.sendMessage(event);
+                this.connections.get(provideAnswer.to)?.sendMessage(event);
                 break;
             case EventType.ConnectionEstablished:
                 this.pendingConnectionQueue.pop();

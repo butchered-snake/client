@@ -17,6 +17,8 @@ export class Event {
                 return new (ProvideOffer as EventConstructor<ProvideOffer>)(...args);
             case EventType.ProvideAnswer:
                 return new (ProvideAnswer as EventConstructor<ProvideAnswer>)(...args);
+            case EventType.ConnectionEstablished:
+                return new (ConnectionEstablished as EventConstructor<ConnectionEstablished>)(...args);
             case EventType.FoodPosUpdate:
                 return new (FoodPosUpdate as EventConstructor<FoodPosUpdate>)(...args);
             case EventType.HeadPosUpdate:
