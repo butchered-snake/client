@@ -210,6 +210,7 @@ export class AdminClientService {
     private startGame(): void {
         this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
         this.sendEventToRandomClient(new PlaceSnake());
+        this.sendEventToRandomClient(new SetFood());
         this.sendEventToClients(new StartGame());
         this.tickSubscription = this.tickTimer.subscribe((value) => {
             this.sendEventToClients(new Tick());

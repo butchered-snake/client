@@ -73,6 +73,22 @@ export class BoardService {
         this._food = value;
     }
 
+    placeFood(): Position {
+        let cellState: BoardCellState = BoardCellState.Wall;
+        let x = 0;
+        let y = 0;
+        while(cellState != BoardCellState.Free) {
+            x = Math.floor(Math.random() * (this.grid.length - 2)) + 1;
+            y = Math.floor(Math.random() * (this.grid[x].length - 2)) + 1;
+            cellState = this.grid[x][y];
+        }
+        const ret: Position = {x: x, y: y};
+        this.logger.debug('creating food', ret);
+        this.changeGridCells([ret], BoardCellState.Food);
+        this.food = ret;
+        return ret;
+    }
+
     private _headIndicator: Position | null = null;
 
     get headIndicator(): Position | null {

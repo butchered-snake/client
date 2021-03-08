@@ -4,8 +4,10 @@ import {
     ConnectionEstablished,
     Event,
     FoodPosUpdate,
-    HeadEntering,
+    SetFood,
+    PlacedFood,
     HeadPosUpdate,
+    HeadEntering,
     ProvideAnswer,
     ProvideOffer,
     RequestOffer,
@@ -115,11 +117,18 @@ export class ClientService {
             case EventType.PlaceSnake:
                 this.board.setSnake();
                 break;
+            case EventType.SetFood:
+                const setFood: SetFood = (event as SetFood);
+                this.adminConnection!.sendMessage(new PlacedFood(this.board.placeFood(), this.id.id));
+                break;
             case EventType.FoodPosUpdate:
                 if (this.board.food) {
                     break;
                 }
                 this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
+                break;
+            case EventType.FoodEaten:
+                // TODO tell board that tail needs to be longer
                 break;
             case EventType.SetClientId:
                 const setClientId: SetClientId = (event as SetClientId);
