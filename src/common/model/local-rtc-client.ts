@@ -10,13 +10,15 @@ export class LocalRTCClient extends RTCClient {
     setUpDataChannel(): void {
         this.dataChannel = this.peerConnection.createDataChannel('channel');
         this.dataChannel.onmessage = this.handleDataChannelMessage.bind(this);
+        this.dataChannel.onerror = (event: RTCErrorEvent) => this.logger.error('on data channel error', event.error.message);
         this.dataChannel.onopen = (event: Event) => {
             this.connectionEstablished.next();
             this.logger.debug('data channel opened');
         };
     }
 
-    public createNewOffer(offerCallback: (offer: RTCSessionDescriptionInit) => void = (o: RTCSessionDescriptionInit) => {}): void {
+    public createNewOffer(offerCallback: (offer: RTCSessionDescriptionInit) => void = (o: RTCSessionDescriptionInit) => {
+    }): void {
         this.peerConnection.createOffer()
             .then((offer: RTCSessionDescriptionInit) => {
                 this.peerConnection.setLocalDescription(offer);

@@ -11,6 +11,7 @@ export class RemoteRTCClient extends RTCClient {
         this.peerConnection.ondatachannel = (event: RTCDataChannelEvent) => {
             this.dataChannel = event.channel;
             this.dataChannel.onmessage = this.handleDataChannelMessage.bind(this);
+            this.dataChannel.onerror = (event: RTCErrorEvent) => this.logger.error('on data channel error', event.error.message);
             this.dataChannel.onopen = (event: Event) => {
                 this.logger.debug('data channel opened');
                 this.connectionEstablished.next();
@@ -18,7 +19,8 @@ export class RemoteRTCClient extends RTCClient {
         };
     }
 
-    public createNewAnswer(answerCallback: (answer: RTCSessionDescriptionInit) => void = (a: RTCSessionDescriptionInit) => {}): void {
+    public createNewAnswer(answerCallback: (answer: RTCSessionDescriptionInit) => void = (a: RTCSessionDescriptionInit) => {
+    }): void {
         this.peerConnection.createAnswer()
             .then((answer: RTCSessionDescriptionInit) => {
                 this.peerConnection.setLocalDescription(answer);

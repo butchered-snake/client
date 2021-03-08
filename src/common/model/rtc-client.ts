@@ -14,6 +14,7 @@ export abstract class RTCClient {
         this.connectionEstablished = new Subject<void>();
         this._newIceCandidate = new Subject<RTCSessionDescription>();
         this.peerConnection = new RTCPeerConnection();
+        this.peerConnection.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => this.baseLogger.error('ice connection error', error.errorText);
         this.setUpDataChannel();
 
         this.peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
