@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import {LogService} from './log.service';
 import {ClientId} from '../model/client-id';
 import {LocalRTCClient} from '../model/local-rtc-client';
@@ -6,7 +6,20 @@ import {Position} from '../shared/types';
 import {BoardService} from './board.service';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {Router} from '@angular/router';
-import {Event, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId, PlaceSnake, StartGame, StopGame, SetFood, PlacedFood, FoodPosUpdate, FoodEaten, Tick} from '../model/event';
+import {
+    Event,
+    FoodPosUpdate,
+    PlacedFood,
+    PlaceSnake,
+    ProvideAnswer,
+    ProvideOffer,
+    RequestOffer,
+    SetClientId,
+    SetFood,
+    StartGame,
+    StopGame,
+    Tick
+} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {interval, Observable, Subscription} from 'rxjs';
 
@@ -25,7 +38,7 @@ export class AdminClientService {
     private tickTimer: Observable<number>;
     private tickSubscription: Subscription | undefined;
 
-    constructor(private logger: LogService, private boardService: BoardService,
+    constructor(private logger: LogService, private boardService: BoardService, private ngZone: NgZone,
                 private adminClientConnectionService: AdminClientConnectionService, private router: Router) {
         this.pendingConnectionQueue = [];
         this.connectionChecker = interval(1000);
@@ -151,6 +164,17 @@ export class AdminClientService {
         }));
     }
 
+    sendEventToClients(event: Event) {
+        this.connections.forEach((connection: LocalRTCClient, id: number) => {
+            connection.sendMessage(event);
+        });
+    }
+
+    sendEventToRandomClient(event: Event) {
+        let keys = Array.from(this.connections.keys());
+        this.connections.get(keys[Math.floor(Math.random() * keys.length)])?.sendMessage(event);
+    }
+
     private sendClientIdEvents(): void {
         this.connections.forEach((connection: LocalRTCClient, id: number) => {
             connection.sendMessage(new SetClientId(id));
@@ -226,45 +250,36 @@ export class AdminClientService {
     }
 
     private processEvent(event: Event) {
-        switch (event.type) {
-            case EventType.StopGame:
-                const stopGame: StopGame = (event as StopGame);
-                this.logger.info("game should stop", stopGame.reason);
-                this.tickSubscription?.unsubscribe();
-                this.sendEventToClients(new StopGame(stopGame.reason));
-                break;
-            case EventType.PlacedFood:
-                const placedFood: PlacedFood = (event as PlacedFood);
-                this.sendEventToClients(new FoodPosUpdate(placedFood.newPos, placedFood.from));
-                break;
-            case EventType.FoodEaten:
-                this.sendEventToClients(event);
-                this.sendEventToRandomClient(new SetFood())
-                break;
-            case EventType.ProvideOffer:
-                const provideOffer: ProvideOffer = (event as ProvideOffer);
-                provideOffer.fromName = this.idToName.get(provideOffer.from) ?? "";
-                this.connections.get(provideOffer.to)?.sendMessage(event);
-                break;
-            case EventType.ProvideAnswer:
-                const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
-                this.connections.get(provideAnswer.to)?.sendMessage(event);
-                break;
-            case EventType.ConnectionEstablished:
-                this.pendingConnectionQueue.pop();
-                break;
-        }
-    }
-
-    sendEventToClients(event: Event) {
-        this.connections.forEach((connection: LocalRTCClient, id: number) => {
-            connection.sendMessage(event);
+        this.ngZone.run(() => {
+            switch (event.type) {
+                case EventType.StopGame:
+                    const stopGame: StopGame = (event as StopGame);
+                    this.logger.info('game should stop', stopGame.reason);
+                    this.tickSubscription?.unsubscribe();
+                    this.sendEventToClients(new StopGame(stopGame.reason));
+                    break;
+                case EventType.PlacedFood:
+                    const placedFood: PlacedFood = (event as PlacedFood);
+                    this.sendEventToClients(new FoodPosUpdate(placedFood.newPos, placedFood.from));
+                    break;
+                case EventType.FoodEaten:
+                    this.sendEventToClients(event);
+                    this.sendEventToRandomClient(new SetFood());
+                    break;
+                case EventType.ProvideOffer:
+                    const provideOffer: ProvideOffer = (event as ProvideOffer);
+                    provideOffer.fromName = this.idToName.get(provideOffer.from) ?? '';
+                    this.connections.get(provideOffer.to)?.sendMessage(event);
+                    break;
+                case EventType.ProvideAnswer:
+                    const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
+                    this.connections.get(provideAnswer.to)?.sendMessage(event);
+                    break;
+                case EventType.ConnectionEstablished:
+                    this.pendingConnectionQueue.pop();
+                    break;
+            }
         });
-    }
-
-    sendEventToRandomClient(event: Event) {
-        let keys = Array.from(this.connections.keys());
-        this.connections.get(keys[Math.floor(Math.random() * keys.length)])?.sendMessage(event);
     }
 }
 

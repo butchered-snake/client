@@ -63,13 +63,6 @@ export class BoardService {
         this._tail = value;
     }
 
-    elongateTail() {
-        if (!this.tail) {
-            return;
-        }
-        // TODO implement this
-    }
-
     private _food: Position | null = null;
 
     get food(): Position | null {
@@ -81,21 +74,6 @@ export class BoardService {
             this.changeGridCells([value], BoardCellState.Food);
         }
         this._food = value;
-    }
-
-    placeFood(): Position {
-        let cellState: BoardCellState = BoardCellState.Wall;
-        let x = 0;
-        let y = 0;
-        while(cellState != BoardCellState.Free) {
-            x = Math.floor(Math.random() * (this.grid.length - 2)) + 1;
-            y = Math.floor(Math.random() * (this.grid[x].length - 2)) + 1;
-            cellState = this.grid[x][y];
-        }
-        const ret: Position = {x: x, y: y};
-        this.logger.debug('creating food', ret);
-        this.food = ret;
-        return ret;
     }
 
     private _headIndicator: Position | null = null;
@@ -128,12 +106,33 @@ export class BoardService {
         this._foodIndicator = value;
     }
 
+    elongateTail() {
+        if (!this.tail) {
+            return;
+        }
+        // TODO implement this
+    }
+
+    placeFood(): Position {
+        let cellState: BoardCellState = BoardCellState.Wall;
+        let x = 0;
+        let y = 0;
+        while (cellState != BoardCellState.Free) {
+            x = Math.floor(Math.random() * (this.grid.length - 2)) + 1;
+            y = Math.floor(Math.random() * (this.grid[x].length - 2)) + 1;
+            cellState = this.grid[x][y];
+        }
+        const ret: Position = {x: x, y: y};
+        this.logger.debug('creating food', ret);
+        this.food = ret;
+        return ret;
+    }
+
     setEventCallback(fn: (event: Event) => void) {
         this.onEvent = fn;
     }
 
     tick() {
-
         if (this.head) {
             this.moveQueue.unshift(this.headDirection);
             const newPosition = this.getNewPosition(this.head, this.headDirection);

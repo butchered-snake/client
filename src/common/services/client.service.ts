@@ -1,17 +1,17 @@
-import {Injectable} from '@angular/core';
+import {Injectable, NgZone} from '@angular/core';
 import {LogService} from './log.service';
 import {
     ConnectionEstablished,
     Event,
     FoodPosUpdate,
-    SetFood,
-    PlacedFood,
-    HeadPosUpdate,
     HeadEntering,
+    HeadPosUpdate,
+    PlacedFood,
     ProvideAnswer,
     ProvideOffer,
     RequestOffer,
     SetClientId,
+    SetFood,
     TailEntering
 } from '../model/event';
 import {EventType} from '../shared/event-type.enum';
@@ -36,7 +36,7 @@ export class ClientService {
     private neighbours: Map<Direction, Neighbour>;
     private adminConnection: RemoteRTCClient | null = null;
 
-    constructor(private logger: LogService, private board: BoardService) {
+    constructor(private logger: LogService, private board: BoardService, private ngZone: NgZone) {
         this.gameStarted = new Subject<void>();
         this.id = new ClientId(0);
         this.neighbours = new Map();
@@ -58,132 +58,138 @@ export class ClientService {
     }
 
     processNeighbourEvent(event: Event) {
-        switch (event.type) {
-            case EventType.HeadPosUpdate:
-                this.board.headIndicator = this.getNewHeadIndicatorPosition(event as HeadPosUpdate);
-                break;
-            case EventType.HeadEntering:
-                const headEntering: HeadEntering = (event as HeadEntering);
-                this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos);
-                this.board.headDirection = headEntering.direction;
-                break;
-            case EventType.TailEntering:
-                const tailEntering: TailEntering = (event as TailEntering);
-                this.board.tail = this.getNewPosFromDirectionalPos(tailEntering.direction, tailEntering.oldPos);
-                break;
+        this.ngZone.run(() => {
+            switch (event.type) {
+                case EventType.HeadPosUpdate:
+                    this.board.headIndicator = this.getNewHeadIndicatorPosition(event as HeadPosUpdate);
+                    break;
+                case EventType.HeadEntering:
+                    const headEntering: HeadEntering = (event as HeadEntering);
+                    this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos);
+                    this.board.headDirection = headEntering.direction;
+                    break;
+                case EventType.TailEntering:
+                    const tailEntering: TailEntering = (event as TailEntering);
+                    this.board.tail = this.getNewPosFromDirectionalPos(tailEntering.direction, tailEntering.oldPos);
+                    break;
+            }
+        });
 
-        }
     }
 
     processBoardEvent(event: Event) {
-        switch (event.type) {
-            case EventType.FoodEaten:
-                this.adminConnection!.sendMessage(event);
-                break;
-            case EventType.HeadEntering:
-                const headEntering: HeadEntering = (event as HeadEntering);
-                this.sendEventToNeighbour(headEntering.direction, headEntering);
-                break;
-            case EventType.TailEntering:
-                const tailEntering: TailEntering = (event as TailEntering);
-                this.sendEventToNeighbour(tailEntering.direction, tailEntering);
-                break;
-            case EventType.PlacedFood:
-                this.adminConnection!.sendMessage(event);
-                break;
-            case EventType.HeadPosUpdate:
-                const headPosUpdate: HeadPosUpdate = (event as HeadPosUpdate);
-                this.sendEventToNeighbour(headPosUpdate.direction, headPosUpdate);
-                break;
-            case EventType.StopGame:
-                this.adminConnection!.sendMessage(event);
-                break;
-        }
-
+        this.ngZone.run(() => {
+            switch (event.type) {
+                case EventType.FoodEaten:
+                    this.adminConnection!.sendMessage(event);
+                    break;
+                case EventType.HeadEntering:
+                    const headEntering: HeadEntering = (event as HeadEntering);
+                    this.sendEventToNeighbour(headEntering.direction, headEntering);
+                    break;
+                case EventType.TailEntering:
+                    const tailEntering: TailEntering = (event as TailEntering);
+                    this.sendEventToNeighbour(tailEntering.direction, tailEntering);
+                    break;
+                case EventType.PlacedFood:
+                    this.adminConnection!.sendMessage(event);
+                    break;
+                case EventType.HeadPosUpdate:
+                    const headPosUpdate: HeadPosUpdate = (event as HeadPosUpdate);
+                    this.sendEventToNeighbour(headPosUpdate.direction, headPosUpdate);
+                    break;
+                case EventType.StopGame:
+                    this.adminConnection!.sendMessage(event);
+                    break;
+            }
+        });
     }
 
     processAdminEvent(event: Event) {
-        let neighbourId: ClientId;
-        let direction: Direction;
+        this.ngZone.run(() => {
+            let neighbourId: ClientId;
+            let direction: Direction;
 
-        switch (event.type) {
-            case EventType.Tick:
-                this.board.tick();
-                break;
-            case EventType.StartGame:
-                this.logger.info('Game started');
-                this.gameStarted.next();
-                break;
-            case EventType.PlaceSnake:
-                this.board.setSnake();
-                break;
-            case EventType.SetFood:
-                const setFood: SetFood = (event as SetFood);
-                this.adminConnection!.sendMessage(new PlacedFood(this.board.placeFood(), this.id.id));
-                break;
-            case EventType.FoodPosUpdate:
-                if (this.board.food) {
+            switch (event.type) {
+                case EventType.Tick:
+                    this.board.tick();
                     break;
-                }
-                this.board.elongateTail();
-                this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
-                break;
-            case EventType.FoodEaten:
-                this.board.elongateTail();
-                break;
-            case EventType.SetClientId:
-                const setClientId: SetClientId = (event as SetClientId);
-                this.id = new ClientId(setClientId.id);
-                this.logger.info('Set client id', setClientId.id);
-                break;
-            case EventType.RequestOffer:
-                const requestOffer: RequestOffer = (event as RequestOffer);
-                neighbourId = new ClientId(requestOffer.from);
-                direction = this.getNeighbourDirection(neighbourId);
-                const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
-                let gotOffer: boolean = false;
-                localConnection.newIceCandidate.subscribe(offer => {
-                    if (gotOffer) {
-                        return;
+                case EventType.StartGame:
+                    this.logger.info('Game started');
+                    this.gameStarted.next();
+                    break;
+                case EventType.PlaceSnake:
+                    this.board.setSnake();
+                    break;
+                case EventType.SetFood:
+                    const setFood: SetFood = (event as SetFood);
+                    this.adminConnection!.sendMessage(new PlacedFood(this.board.placeFood(), this.id.id));
+                    break;
+                case EventType.FoodPosUpdate:
+                    if (this.board.food) {
+                        break;
                     }
-                    this.adminConnection?.sendMessage(new ProvideOffer(this.id.id, '', neighbourId.id, JSON.stringify(offer)));
-                    gotOffer = true;
-                });
-                localConnection.createNewOffer();
-                this.addNeighbour(direction, neighbourId, localConnection);
-                this.board.addNeighbour(direction, requestOffer.fromName);
-                break;
-            case EventType.ProvideOffer:
-                const provideOffer: ProvideOffer = (event as ProvideOffer);
-                neighbourId = new ClientId(provideOffer.from);
-                direction = this.getNeighbourDirection(neighbourId);
-                const remoteConnection: RemoteRTCClient = new RemoteRTCClient(this.logger);
-                remoteConnection.connectionEstablished.subscribe(value => {
-                    this.adminConnection?.sendMessage(new ConnectionEstablished(this.id.id, neighbourId.id));
-                    remoteConnection.connectionEstablished.unsubscribe();
-                });
-                let gotAnswer: boolean = false;
-                remoteConnection.newIceCandidate.subscribe((answer) => {
-                    if (gotAnswer) {
-                        return;
+                    this.board.elongateTail();
+                    this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
+                    break;
+                case EventType.FoodEaten:
+                    this.board.elongateTail();
+                    break;
+                case EventType.SetClientId:
+                    const setClientId: SetClientId = (event as SetClientId);
+                    this.id = new ClientId(setClientId.id);
+                    this.logger.info('Set client id', setClientId.id);
+                    break;
+                case EventType.RequestOffer:
+                    const requestOffer: RequestOffer = (event as RequestOffer);
+                    neighbourId = new ClientId(requestOffer.from);
+                    direction = this.getNeighbourDirection(neighbourId);
+                    const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
+                    let gotOffer: boolean = false;
+                    localConnection.newIceCandidate.subscribe(offer => {
+                        if (gotOffer) {
+                            return;
+                        }
+                        this.adminConnection?.sendMessage(new ProvideOffer(this.id.id, '', neighbourId.id, JSON.stringify(offer)));
+                        gotOffer = true;
+                    });
+                    localConnection.createNewOffer();
+                    this.addNeighbour(direction, neighbourId, localConnection);
+                    this.board.addNeighbour(direction, requestOffer.fromName);
+                    break;
+                case EventType.ProvideOffer:
+                    const provideOffer: ProvideOffer = (event as ProvideOffer);
+                    neighbourId = new ClientId(provideOffer.from);
+                    direction = this.getNeighbourDirection(neighbourId);
+                    const remoteConnection: RemoteRTCClient = new RemoteRTCClient(this.logger);
+                    remoteConnection.connectionEstablished.subscribe(value => {
+                        this.adminConnection?.sendMessage(new ConnectionEstablished(this.id.id, neighbourId.id));
+                        remoteConnection.connectionEstablished.unsubscribe();
+                    });
+                    let gotAnswer: boolean = false;
+                    remoteConnection.newIceCandidate.subscribe((answer) => {
+                        if (gotAnswer) {
+                            return;
+                        }
+                        this.adminConnection?.sendMessage(new ProvideAnswer(this.id.id, neighbourId.id, JSON.stringify(answer)));
+                        gotAnswer = true;
+                    });
+                    remoteConnection.setOffer(JSON.parse(provideOffer.offer)).then((res) => {
+                        remoteConnection.createNewAnswer();
+                    });
+                    this.addNeighbour(direction, neighbourId, remoteConnection);
+                    this.board.addNeighbour(direction, provideOffer.fromName);
+                    break;
+                case EventType.ProvideAnswer:
+                    const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
+                    let neighbour = this.neighbours.get(this.getNeighbourDirection(new ClientId(provideAnswer.from)));
+                    if (neighbour?.connection) {
+                        (neighbour.connection as LocalRTCClient).setAnswer(JSON.parse(provideAnswer.answer));
                     }
-                    this.adminConnection?.sendMessage(new ProvideAnswer(this.id.id, neighbourId.id, JSON.stringify(answer)));
-                    gotAnswer = true;
-                });
-                remoteConnection.setOffer(JSON.parse(provideOffer.offer)).then((res) => {
-                    remoteConnection.createNewAnswer();
-                });
-                this.addNeighbour(direction, neighbourId, remoteConnection);
-                this.board.addNeighbour(direction, provideOffer.fromName);
-                break;
-            case EventType.ProvideAnswer:
-                const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
-                let neighbour = this.neighbours.get(this.getNeighbourDirection(new ClientId(provideAnswer.from)));
-                if (neighbour?.connection) {
-                    (neighbour.connection as LocalRTCClient).setAnswer(JSON.parse(provideAnswer.answer));
-                }
-                break;
-        }
+                    break;
+            }
+        });
+
     }
 
     getNeighbourDirection(neighbourId: ClientId): Direction {
