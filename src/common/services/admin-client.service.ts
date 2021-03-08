@@ -145,7 +145,7 @@ export class AdminClientService {
     private startClientHandshakes(): void {
         const partners = this.createHandshakePartners();
         partners.forEach(partner => {
-            this.connections.get(partner.from.id)!.sendMessage(new RequestOffer(partner.from.id, this.idToName.get(partner.from.id)!, partner.to.id));
+            this.connections.get(partner.to.id)!.sendMessage(new RequestOffer(partner.from.id, this.idToName.get(partner.from.id)!, partner.to.id));
             this.pendingConnectionQueue.push(true);
         });
     }
