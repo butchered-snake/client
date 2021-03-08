@@ -1,17 +1,29 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, NgZone, OnDestroy} from '@angular/core';
 import {ClientConnectionService} from '../../../common/services/client-connection.service';
+import {Router} from '@angular/router';
+import {LogService} from '../../../common/services/log.service';
+import {Subscription} from 'rxjs';
+import {ClientService} from '../../../common/services/client.service';
 
 @Component({
     selector: 'app-wait-lobby',
     templateUrl: './wait-lobby.component.html',
     styleUrls: ['./wait-lobby.component.css']
 })
-export class WaitLobbyComponent implements OnInit {
+export class WaitLobbyComponent implements OnDestroy {
 
-    constructor(public clientConnectionService: ClientConnectionService) {
+    private gameStartedSubscription: Subscription;
+
+    constructor(public clientConnectionService: ClientConnectionService, private clientService: ClientService, private router: Router, private logger: LogService, private ngZone: NgZone) {
+        this.gameStartedSubscription = this.clientService.gameStarted.subscribe(() => {
+            this.ngZone.run(() => {
+                this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
+            });
+        });
     }
 
-    ngOnInit(): void {
+    ngOnDestroy(): void {
+        this.gameStartedSubscription.unsubscribe();
     }
 }
 

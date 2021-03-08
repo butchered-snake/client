@@ -4,13 +4,13 @@ import {
     ConnectionEstablished,
     Event,
     FoodPosUpdate,
-    HeadPosUpdate,
     HeadEntering,
-    TailEntering,
+    HeadPosUpdate,
     ProvideAnswer,
     ProvideOffer,
     RequestOffer,
-    SetClientId
+    SetClientId,
+    TailEntering
 } from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {ClientId} from '../model/client-id';
@@ -22,17 +22,20 @@ import {LocalRTCClient} from '../model/local-rtc-client';
 import {RemoteRTCClient} from '../model/remote-rtc-client';
 import {Position} from '../shared/types';
 import {environment} from '../../environments/environment';
+import {Subject} from 'rxjs';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ClientService {
     public name: string = '';
+    public gameStarted: Subject<void>;
     private id: ClientId;
     private neighbours: Map<Direction, Neighbour>;
     private adminConnection: RemoteRTCClient | null = null;
 
     constructor(private logger: LogService, private board: BoardService) {
+        this.gameStarted = new Subject<void>();
         this.id = new ClientId(0);
         this.neighbours = new Map();
         this.board.setEventCallback(this.processBoardEvent.bind(this));
@@ -105,6 +108,10 @@ export class ClientService {
             case EventType.Tick:
                 this.board.tick();
                 break;
+            case EventType.StartGame:
+                this.logger.info('Game started');
+                this.gameStarted.next();
+                break;
             case EventType.PlaceSnake:
                 this.board.setSnake();
                 break;
@@ -169,6 +176,43 @@ export class ClientService {
         }
     }
 
+    getNeighbourDirection(neighbourId: ClientId): Direction {
+        const coords = this.id.getCoordinates();
+        const neighbourCoords = neighbourId.getCoordinates();
+
+        const coordTransformDif = {
+            x: coords.x - 1,
+            y: coords.y - 1
+        };
+
+        const transformedNeighbourCoords = {
+            x: neighbourCoords.x - coordTransformDif.x,
+            y: neighbourCoords.y - coordTransformDif.y
+        };
+
+        switch (ClientId.fromCoordinates(transformedNeighbourCoords).id) {
+            case ClientId.fromCoordinates({x: 0, y: 0}).id:
+                return Direction.NorthWest;
+            case ClientId.fromCoordinates({x: 1, y: 0}).id:
+                return Direction.North;
+            case ClientId.fromCoordinates({x: 2, y: 0}).id:
+                return Direction.NorthEast;
+            case ClientId.fromCoordinates({x: 2, y: 1}).id:
+                return Direction.East;
+            case ClientId.fromCoordinates({x: 2, y: 2}).id:
+                return Direction.SouthEast;
+            case ClientId.fromCoordinates({x: 1, y: 2}).id:
+                return Direction.South;
+            case ClientId.fromCoordinates({x: 0, y: 2}).id:
+                return Direction.SouthWest;
+            case ClientId.fromCoordinates({x: 0, y: 1}).id:
+                return Direction.West;
+        }
+
+        this.logger.error('neighbour should not have same pos as client');
+        return 25;
+    }
+
     private sendEventToNeighbour(direction: Direction, event: Event) {
         this.neighbours.get(direction)?.connection?.sendMessage(event);
     }
@@ -210,43 +254,6 @@ export class ClientService {
         }
 
         return newPosition;
-    }
-
-    getNeighbourDirection(neighbourId: ClientId): Direction {
-        const coords = this.id.getCoordinates();
-        const neighbourCoords = neighbourId.getCoordinates();
-
-        const coordTransformDif = {
-            x: coords.x - 1,
-            y: coords.y - 1
-        };
-
-        const transformedNeighbourCoords = {
-            x: neighbourCoords.x - coordTransformDif.x,
-            y: neighbourCoords.y - coordTransformDif.y
-        };
-
-        switch (ClientId.fromCoordinates(transformedNeighbourCoords).id) {
-            case ClientId.fromCoordinates({x: 0, y: 0}).id:
-                return Direction.NorthWest;
-            case ClientId.fromCoordinates({x: 1, y: 0}).id:
-                return Direction.North;
-            case ClientId.fromCoordinates({x: 2, y: 0}).id:
-                return Direction.NorthEast;
-            case ClientId.fromCoordinates({x: 2, y: 1}).id:
-                return Direction.East;
-            case ClientId.fromCoordinates({x: 2, y: 2}).id:
-                return Direction.SouthEast;
-            case ClientId.fromCoordinates({x: 1, y: 2}).id:
-                return Direction.South;
-            case ClientId.fromCoordinates({x: 0, y: 2}).id:
-                return Direction.SouthWest;
-            case ClientId.fromCoordinates({x: 0, y: 1}).id:
-                return Direction.West;
-        }
-
-        this.logger.error('neighbour should not have same pos as client');
-        return 25;
     }
 
     private getNewFoodIndicatorPosition(event: FoodPosUpdate): Position {
