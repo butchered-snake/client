@@ -2,8 +2,14 @@ export enum EventType {
     Invalid,
 
     //admin
-    FoodPosUpdate,
+    PlaceSnake,
     StartGame,
+    StopGame,
+    SetFood,
+    PlacedFood,
+    FoodPosUpdate,
+    FoodEaten,
+    Tick,
     RequestOffer,
     SetClientId,
     ProvideOffer,
@@ -11,5 +17,7 @@ export enum EventType {
     ConnectionEstablished,
 
     // neighbour
-    HeadPosUpdate
+    HeadPosUpdate,
+    HeadEntering,
+    TailEntering
 }

@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {LogService} from './log.service';
-import {Event, HeadPosUpdate, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId} from '../model/event';
+import {Event, ConnectionEstablished, HeadPosUpdate, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {ClientId} from '../model/client-id';
 import {Neighbour} from '../model/neighbour';
@@ -70,7 +70,7 @@ export class ClientService {
                     if (gotOffer) {
                         return;
                     }
-                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id.id, '', neighbourId.id, JSON.stringify(offer)));
+                    this.adminConnection?.sendMessage(new ProvideOffer(this.id.id, '', neighbourId.id, JSON.stringify(offer)));
                     gotOffer = true;
                 });
                 localConnection.createNewOffer();
@@ -83,7 +83,7 @@ export class ClientService {
                 direction = this.getNeighbourDirection(neighbourId);
                 const remoteConnection: RemoteRTCClient = new RemoteRTCClient(this.logger);
                 remoteConnection.connectionEstablished.subscribe(value => {
-                    this.adminConnection?.sendMessage(Event.New(EventType.ConnectionEstablished));
+                    this.adminConnection?.sendMessage(new ConnectionEstablished(this.id.id, neighbourId.id));
                     remoteConnection.connectionEstablished.unsubscribe();
                 });
                 let gotAnswer: boolean = false;
@@ -91,7 +91,7 @@ export class ClientService {
                     if (gotAnswer) {
                         return;
                     }
-                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideAnswer, this.id.id, neighbourId.id, JSON.stringify(answer)));
+                    this.adminConnection?.sendMessage(new ProvideAnswer(this.id.id, neighbourId.id, JSON.stringify(answer)));
                     gotAnswer = true;
                 });
                 remoteConnection.setOffer(JSON.parse(provideOffer.offer)).then((res) => {

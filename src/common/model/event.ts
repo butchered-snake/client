@@ -4,30 +4,6 @@ import {Position} from '../shared/types';
 
 export class Event {
     constructor(public type: EventType) {}
-
-    static New(type: EventType, ...args: any[]): Event {
-        switch(type) {
-            case EventType.StartGame:
-                return new (StartGame as EventConstructor<StartGame>)(...args);
-            case EventType.RequestOffer:
-                return new (RequestOffer as EventConstructor<RequestOffer>)(...args);
-            case EventType.SetClientId:
-                return new (SetClientId as EventConstructor<SetClientId>)(...args);
-            case EventType.ProvideOffer:
-                return new (ProvideOffer as EventConstructor<ProvideOffer>)(...args);
-            case EventType.ProvideAnswer:
-                return new (ProvideAnswer as EventConstructor<ProvideAnswer>)(...args);
-            case EventType.ConnectionEstablished:
-                return new (ConnectionEstablished as EventConstructor<ConnectionEstablished>)(...args);
-            case EventType.FoodPosUpdate:
-                return new (FoodPosUpdate as EventConstructor<FoodPosUpdate>)(...args);
-            case EventType.HeadPosUpdate:
-                return new (HeadPosUpdate as EventConstructor<HeadPosUpdate>)(...args);
-            default:
-                console.error("grosse unehre");
-                return new Event(EventType.Invalid);
-        }
-    }
 }
 
 interface EventConstructor<T> {
@@ -41,9 +17,51 @@ export class AdminEvent extends Event {
     }
 }
 
+export class PlaceSnake extends AdminEvent {
+    constructor() {
+        super(EventType.PlaceSnake);
+    }
+}
+
 export class StartGame extends AdminEvent {
     constructor() {
         super(EventType.StartGame);
+    }
+}
+
+export class StopGame extends AdminEvent {
+    constructor(public reason: string) {
+        super(EventType.StopGame);
+    }
+}
+
+export class SetFood extends AdminEvent {
+    constructor() {
+        super(EventType.SetFood);
+    }
+}
+
+export class PlacedFood extends AdminEvent {
+    constructor(public newPos: Position, from: number) {
+        super(EventType.PlacedFood);
+    }
+}
+
+export class FoodPosUpdate extends AdminEvent {
+    constructor(public newPos: Position, from: number) {
+        super(EventType.FoodPosUpdate);
+    }
+}
+
+export class FoodEaten extends AdminEvent {
+    constructor() {
+        super(EventType.FoodEaten);
+    }
+}
+
+export class Tick extends AdminEvent {
+    constructor() {
+        super(EventType.Tick);
     }
 }
 
@@ -77,12 +95,6 @@ export class ConnectionEstablished extends AdminEvent {
     }
 }
 
-export class FoodPosUpdate extends AdminEvent {
-    constructor(public newPos: Position) {
-        super(EventType.FoodPosUpdate);
-    }
-}
-
 // neighbour events
 export class NeighbourEvent extends Event {
     constructor(type: EventType, public direction: Direction) {
@@ -93,6 +105,18 @@ export class NeighbourEvent extends Event {
 export class HeadPosUpdate extends NeighbourEvent {
     constructor(direction: Direction, public newPos: Position) {
         super(EventType.HeadPosUpdate, direction);
+    }
+}
+
+export class HeadEntering extends NeighbourEvent {
+    constructor(direction: Direction, public oldPos: Position) {
+        super(EventType.HeadEntering, direction);
+    }
+}
+
+export class TailEntering extends NeighbourEvent {
+    constructor(direction: Direction, public oldPos: Position) {
+        super(EventType.TailEntering, direction);
     }
 }
 

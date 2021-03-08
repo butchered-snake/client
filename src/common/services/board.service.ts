@@ -34,6 +34,8 @@ export class BoardService {
         this.onEvent = fn;
     }
 
+    tick() {}
+
     private _head: Position | null = null;
 
     get head(): Position | null {
