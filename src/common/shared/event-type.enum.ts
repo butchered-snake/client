@@ -8,6 +8,7 @@ export enum EventType {
     SetClientId,
     ProvideOffer,
     ProvideAnswer,
+    ConnectionEstablished,
 
     // neighbour
     HeadPosUpdate

@@ -16,10 +16,12 @@ export class LocalRTCClient extends RTCClient {
         };
     }
 
-    public createNewOffer(): void {
+    public createNewOffer(offerCallback: (offer: RTCSessionDescriptionInit) => void = (o: RTCSessionDescriptionInit) => {}): void {
         this.peerConnection.createOffer()
-            .then((offer: RTCSessionDescriptionInit) => this.peerConnection.setLocalDescription(offer))
-            .then(event => this.logger.debug('created new offer'));
+            .then((offer: RTCSessionDescriptionInit) => {
+                this.peerConnection.setLocalDescription(offer);
+                offerCallback(offer);
+            }).then(event => this.logger.debug('created new offer'));
     }
 
     public setAnswer(answer: RTCSessionDescriptionInit): void {

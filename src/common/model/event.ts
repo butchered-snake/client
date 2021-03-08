@@ -64,8 +64,14 @@ export class ProvideOffer extends AdminEvent {
 }
 
 export class ProvideAnswer extends AdminEvent {
-    constructor(public from: number, public to: number, answer: string) {
+    constructor(public from: number, public to: number, public answer: string) {
         super(EventType.ProvideAnswer);
+    }
+}
+
+export class ConnectionEstablished extends AdminEvent {
+    constructor(public from: number, public to: number) {
+        super(EventType.ConnectionEstablished);
     }
 }
 

@@ -1,11 +1,13 @@
 import {Injectable} from '@angular/core';
 import {LogService} from './log.service';
-import {Event, HeadPosUpdate} from '../model/event';
+import {Event, SetClientId, RequestOffer, ProvideOffer, ProvideAnswer, HeadPosUpdate} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {ClientId} from '../model/client-id';
 import {Neighbour} from '../model/neighbour';
 import {Direction} from '../shared/direction.enum';
 import {BoardService} from './board.service';
+import {RTCClient} from '../model/rtc-client';
+import {LocalRTCClient} from '../model/local-rtc-client';
 import {RemoteRTCClient} from '../model/remote-rtc-client';
 
 @Injectable({
@@ -32,8 +34,9 @@ export class ClientService {
         this.logger.info('ClientService init', name);
     }
 
-    addNeighbour(neighbourId: ClientId) {
-        this.neighbours.set(this.getNeighbourDirection(neighbourId), new Neighbour(this.logger, this.processNeighbourEvent.bind(this)));
+    addNeighbour(direction: Direction, neighbourId: ClientId, connection: RTCClient) {
+        const n: Neighbour = new Neighbour(this.logger, neighbourId, connection, this.processNeighbourEvent.bind(this));
+        this.neighbours.set(direction, n);
     }
 
     processNeighbourEvent(event: Event) {
@@ -48,7 +51,48 @@ export class ClientService {
     }
 
     processAdminEvent(event: Event) {
-    
+        this.logger.debug('received admin event', event);
+        let neighbourId: ClientId;
+        let direction: Direction;
+
+        switch (event.type) {
+            case EventType.SetClientId:
+                const setClientId: SetClientId = (event as SetClientId);
+                this.id = new ClientId(setClientId.id);
+                break;
+            case EventType.RequestOffer:
+                const requestOffer: RequestOffer = (event as RequestOffer);
+                neighbourId = new ClientId(requestOffer.from);
+                direction = this.getNeighbourDirection(neighbourId);
+                const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
+                localConnection.createNewOffer(((offer: RTCSessionDescriptionInit) => {
+                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id, "", neighbourId, JSON.stringify(offer)));
+                    this.addNeighbour(direction, neighbourId, localConnection);
+                    this.board.addNeighbour(direction, requestOffer.fromName);
+                }).bind(this));
+                break;
+            case EventType.ProvideOffer:
+                const provideOffer: ProvideOffer = (event as ProvideOffer);
+                neighbourId = new ClientId(provideOffer.from);
+                direction = this.getNeighbourDirection(neighbourId);
+                const remoteConnection: RemoteRTCClient = new RemoteRTCClient(this.logger);
+                remoteConnection.connectionEstablished.subscribe(value => {
+                    this.adminConnection?.sendMessage(Event.New(EventType.ConnectionEstablished));
+                    remoteConnection.connectionEstablished.unsubscribe();
+                });
+                remoteConnection.setOffer(JSON.parse(provideOffer.offer));
+                remoteConnection.createNewAnswer(((answer: RTCSessionDescriptionInit) => {
+                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideAnswer, this.id, neighbourId, JSON.stringify(answer)));
+                    this.addNeighbour(direction, neighbourId, remoteConnection);
+                    this.board.addNeighbour(direction, provideOffer.fromName);
+                }).bind(this));
+                break;
+            case EventType.ProvideAnswer:
+                const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
+                let neighbour = this.neighbours.get(provideAnswer.from);
+                (neighbour?.connection as LocalRTCClient).setAnswer(JSON.parse(provideAnswer.answer));
+                break;
+        }
     }
 
     getNeighbourDirection(neighbourId: ClientId): Direction {

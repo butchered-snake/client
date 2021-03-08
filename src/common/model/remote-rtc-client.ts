@@ -18,10 +18,12 @@ export class RemoteRTCClient extends RTCClient {
         };
     }
 
-    public createNewAnswer(): void {
+    public createNewAnswer(answerCallback: (answer: RTCSessionDescriptionInit) => void = (a: RTCSessionDescriptionInit) => {}): void {
         this.peerConnection.createAnswer()
-            .then((answer: RTCSessionDescriptionInit) => this.peerConnection.setLocalDescription(answer))
-            .then(event => this.logger.debug('answer created successfully'));
+            .then((answer: RTCSessionDescriptionInit) => {
+                this.peerConnection.setLocalDescription(answer);
+                answerCallback(answer);
+            }).then(event => this.logger.debug('answer created successfully'));
     }
 
     public setOffer(offer: RTCSessionDescriptionInit): Promise<void> {
