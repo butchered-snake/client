@@ -125,10 +125,11 @@ export class ClientService {
                 if (this.board.food) {
                     break;
                 }
+                this.board.elongateTail();
                 this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
                 break;
             case EventType.FoodEaten:
-                // TODO tell board that tail needs to be longer
+                this.board.elongateTail();
                 break;
             case EventType.SetClientId:
                 const setClientId: SetClientId = (event as SetClientId);

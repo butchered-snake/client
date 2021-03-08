@@ -63,6 +63,13 @@ export class BoardService {
         this._tail = value;
     }
 
+    elongateTail() {
+        if (!this.tail) {
+            return;
+        }
+        // TODO implement this
+    }
+
     private _food: Position | null = null;
 
     get food(): Position | null {
@@ -70,6 +77,9 @@ export class BoardService {
     }
 
     set food(value: Position | null) {
+        if (value) {
+            this.changeGridCells([value], BoardCellState.Food);
+        }
         this._food = value;
     }
 
@@ -84,7 +94,6 @@ export class BoardService {
         }
         const ret: Position = {x: x, y: y};
         this.logger.debug('creating food', ret);
-        this.changeGridCells([ret], BoardCellState.Food);
         this.food = ret;
         return ret;
     }
@@ -254,6 +263,7 @@ export class BoardService {
             case BoardCellState.Neighbor:
                 return new HeadEntering(this.headDirection, position);
             case BoardCellState.Food:
+                this.food = null;
                 return new FoodEaten();
             default:
         }
