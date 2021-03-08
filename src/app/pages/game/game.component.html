@@ -53,12 +53,13 @@
                                     </div>
                                     <div *ngSwitchCase="boardCellState.FoodIndicator"
                                          [ngStyle]="{'background': 'Cornsilk'}"
-                                         class="item">
-                                        <fa-icon [icon]="foodIcon" class="low-opacity"></fa-icon>
+                                         class="item center-icon">
+                                        <fa-icon [icon]="foodIcon" [ngStyle]="{color: 'black'}"
+                                                 class="low-opacity"></fa-icon>
                                     </div>
                                     <div *ngSwitchCase="boardCellState.Food" [ngStyle]="{'background': 'lightgrey'}"
                                          class="item center-icon">
-                                        <fa-icon [icon]="foodIcon"></fa-icon>
+                                        <fa-icon [icon]="foodIcon" [ngStyle]="{color: 'black'}"></fa-icon>
                                     </div>
                                     <div *ngSwitchDefault [ngStyle]="{'background': 'blue'}" class="item">
 
