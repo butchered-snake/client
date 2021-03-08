@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {LogService} from './log.service';
-import {Event, SetClientId, RequestOffer, ProvideOffer, ProvideAnswer, HeadPosUpdate} from '../model/event';
+import {Event, HeadPosUpdate, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {ClientId} from '../model/client-id';
 import {Neighbour} from '../model/neighbour';
@@ -59,6 +59,7 @@ export class ClientService {
             case EventType.SetClientId:
                 const setClientId: SetClientId = (event as SetClientId);
                 this.id = new ClientId(setClientId.id);
+                this.logger.info('Set client id', setClientId.id);
                 break;
             case EventType.RequestOffer:
                 const requestOffer: RequestOffer = (event as RequestOffer);
@@ -66,7 +67,7 @@ export class ClientService {
                 direction = this.getNeighbourDirection(neighbourId);
                 const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
                 localConnection.createNewOffer(((offer: RTCSessionDescriptionInit) => {
-                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id, "", neighbourId, JSON.stringify(offer)));
+                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id, '', neighbourId, JSON.stringify(offer)));
                     this.addNeighbour(direction, neighbourId, localConnection);
                     this.board.addNeighbour(direction, requestOffer.fromName);
                 }).bind(this));

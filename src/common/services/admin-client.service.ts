@@ -6,7 +6,7 @@ import {Position} from '../shared/types';
 import {BoardService} from './board.service';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {Router} from '@angular/router';
-import {Event, SetClientId, RequestOffer, ProvideOffer, ProvideAnswer, HeadPosUpdate} from '../model/event';
+import {Event, ProvideAnswer, ProvideOffer, RequestOffer, SetClientId} from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 
 @Injectable({
@@ -145,7 +145,7 @@ export class AdminClientService {
     private startClientHandshakes(): void {
         const partners = this.createHandshakePartners();
         partners.forEach(partner => {
-            this.connections.get(partner.from.id)!.sendMessage(new RequestOffer(partner.from.id, this.idToName.get(partner.from.id)!, partner.from.id));
+            this.connections.get(partner.from.id)!.sendMessage(new RequestOffer(partner.from.id, this.idToName.get(partner.from.id)!, partner.to.id));
             this.pendingConnectionQueue.push(true);
         });
     }
@@ -158,10 +158,12 @@ export class AdminClientService {
         for (let i = 0; i <= this.maxY; i++) {
             possiblePlayfield[i] = [];
             for (let j = 0; j <= this.maxX; j++) {
-                const id = ClientId.fromCoordinates({x: i, y: j});
+                const id = ClientId.fromCoordinates({x: j, y: i});
                 possiblePlayfield[i][j] = this.idToName.has(id.id);
             }
         }
+
+        this.logger.info('Possible playfield', possiblePlayfield);
 
         for (let i = 0; i < possiblePlayfield.length; i++) {
             for (let j = 0; j < possiblePlayfield[i].length - 1; j++) {
@@ -185,7 +187,7 @@ export class AdminClientService {
             }
         }
 
-        console.log(partners);
+        this.logger.info('Created partners', partners);
 
         return partners;
     }
