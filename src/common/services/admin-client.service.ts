@@ -5,16 +5,23 @@ import {LocalRTCClient} from '../model/local-rtc-client';
 import {Position} from '../shared/types';
 import {BoardService} from './board.service';
 import {AdminClientConnectionService} from './admin-client-connection.service';
+import {Router} from '@angular/router';
+import {RequestOffer} from '../model/event';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AdminClientService {
 
-    private idToName: Map<ClientId, string> = new Map<ClientId, string>();
-    private connections: Map<ClientId, LocalRTCClient> = new Map<ClientId, LocalRTCClient>();
+    private idToName: Map<number, string> = new Map<number, string>();
+    private connections: Map<number, LocalRTCClient> = new Map<number, LocalRTCClient>();
+    private pendingConnectionQueue: boolean[];
+    private maxX: number = 0;
+    private maxY: number = 0;
 
-    constructor(private logger: LogService, private boardService: BoardService, private adminClientConnectionService: AdminClientConnectionService) {
+    constructor(private logger: LogService, private boardService: BoardService,
+                private adminClientConnectionService: AdminClientConnectionService, private router: Router) {
+        this.pendingConnectionQueue = [];
     }
 
     public addConnections(): void {
@@ -119,12 +126,69 @@ export class AdminClientService {
                     break;
             }
         }
+
+        this.maxX = maxX;
+        this.maxY = maxY;
+        this.logger.info(`maxX: ${maxX}, maxY: ${maxY}`);
+
+        this.startClientHandshakes();
+    }
+
+    private startClientHandshakes(): void {
+        const partners = this.createHandshakePartners();
+        partners.forEach(partner => {
+            this.connections.get(partner.from.id)!.sendMessage(new RequestOffer(partner.from.id, this.idToName.get(partner.from.id)!, partner.from.id));
+        });
+    }
+
+    private createHandshakePartners(): { from: ClientId, to: ClientId }[] {
+        const partners = [];
+
+        const possiblePlayfield: boolean[][] = [];
+
+        for (let i = 0; i <= this.maxY; i++) {
+            possiblePlayfield[i] = [];
+            for (let j = 0; j <= this.maxX; j++) {
+                const id = ClientId.fromCoordinates({x: i, y: j});
+                possiblePlayfield[i][j] = this.idToName.has(id.id);
+            }
+        }
+
+        for (let i = 0; i < possiblePlayfield.length; i++) {
+            for (let j = 0; j < possiblePlayfield[i].length - 1; j++) {
+                if (possiblePlayfield[i][j] && possiblePlayfield[i][j + 1]) {
+                    partners.push({
+                        from: ClientId.fromCoordinates({x: j, y: i}),
+                        to: ClientId.fromCoordinates({x: j + 1, y: i}),
+                    });
+                }
+            }
+        }
+
+        for (let i = 0; i < possiblePlayfield.length - 1; i++) {
+            for (let j = 0; j < possiblePlayfield[i].length; j++) {
+                if (possiblePlayfield[i][j] && possiblePlayfield[i + 1][j]) {
+                    partners.push({
+                        from: ClientId.fromCoordinates({x: j, y: i}),
+                        to: ClientId.fromCoordinates({x: j, y: i + 1}),
+                    });
+                }
+            }
+        }
+
+        console.log(partners);
+
+        return partners;
+    }
+
+    private startGame(): void {
+        this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
     }
 
     private addConnectionToMap(position: Position, name: string, connection: LocalRTCClient): void {
         const id = ClientId.fromCoordinates(position);
-        this.idToName.set(id, name);
-        this.connections.set(id, connection);
+        this.idToName.set(id.id, name);
+        this.connections.set(id.id, connection);
         this.logger.info(`Set connection from ${name} at position x: ${position.x}, y: ${position.y}`);
     }
 }

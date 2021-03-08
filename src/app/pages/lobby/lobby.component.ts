@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {AdminClientConnectionService} from '../../../common/services/admin-client-connection.service';
-import {Router} from '@angular/router';
 import {LogService} from '../../../common/services/log.service';
 import {AdminClientService} from '../../../common/services/admin-client.service';
 
@@ -12,7 +11,7 @@ import {AdminClientService} from '../../../common/services/admin-client.service'
 })
 export class LobbyComponent implements OnInit {
 
-    constructor(private logger: LogService, public adminClientConnectionService: AdminClientConnectionService, private router: Router,
+    constructor(private logger: LogService, public adminClientConnectionService: AdminClientConnectionService,
                 private adminClientService: AdminClientService) {
     }
 
@@ -20,7 +19,6 @@ export class LobbyComponent implements OnInit {
     }
 
     public startGame(): void {
-        this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
         this.adminClientService.addConnections();
     }
 }

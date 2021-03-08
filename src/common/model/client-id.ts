@@ -1,7 +1,7 @@
 import {Position} from '../shared/types';
 
 export class ClientId {
-    private id: number;
+    public id: number;
 
     constructor(id: number) {
         this.id = id;
