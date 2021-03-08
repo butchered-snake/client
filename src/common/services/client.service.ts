@@ -67,7 +67,7 @@ export class ClientService {
                 direction = this.getNeighbourDirection(neighbourId);
                 const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
                 localConnection.createNewOffer(((offer: RTCSessionDescriptionInit) => {
-                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id, '', neighbourId, JSON.stringify(offer)));
+                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideOffer, this.id.id, '', neighbourId.id, JSON.stringify(offer)));
                     this.addNeighbour(direction, neighbourId, localConnection);
                     this.board.addNeighbour(direction, requestOffer.fromName);
                 }).bind(this));
@@ -83,7 +83,7 @@ export class ClientService {
                 });
                 remoteConnection.setOffer(JSON.parse(provideOffer.offer));
                 remoteConnection.createNewAnswer(((answer: RTCSessionDescriptionInit) => {
-                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideAnswer, this.id, neighbourId, JSON.stringify(answer)));
+                    this.adminConnection?.sendMessage(Event.New(EventType.ProvideAnswer, this.id.id, neighbourId.id, JSON.stringify(answer)));
                     this.addNeighbour(direction, neighbourId, remoteConnection);
                     this.board.addNeighbour(direction, provideOffer.fromName);
                 }).bind(this));
