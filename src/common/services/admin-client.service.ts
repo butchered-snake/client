@@ -6,7 +6,8 @@ import {Position} from '../shared/types';
 import {BoardService} from './board.service';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {Router} from '@angular/router';
-import {RequestOffer, SetClientId} from '../model/event';
+import {Event, SetClientId, RequestOffer, ProvideOffer, ProvideAnswer, HeadPosUpdate} from '../model/event';
+import {EventType} from '../shared/event-type.enum';
 
 @Injectable({
     providedIn: 'root'
@@ -145,6 +146,7 @@ export class AdminClientService {
         const partners = this.createHandshakePartners();
         partners.forEach(partner => {
             this.connections.get(partner.from.id)!.sendMessage(new RequestOffer(partner.from.id, this.idToName.get(partner.from.id)!, partner.from.id));
+            this.pendingConnectionQueue.push(true);
         });
     }
 
@@ -195,10 +197,25 @@ export class AdminClientService {
     private addConnectionToMap(position: Position, name: string, connection: LocalRTCClient): void {
         const id = ClientId.fromCoordinates(position);
         this.idToName.set(id.id, name);
+        connection.setOnEventCallback(this.processEvent.bind(this));
         this.connections.set(id.id, connection);
         this.logger.info(`Set connection from ${name} at position x: ${position.x}, y: ${position.y}`);
     }
+
+    private processEvent(event: Event) {
+        switch (event.type) {
+            case EventType.ProvideOffer:
+                const provideOffer: ProvideOffer = (event as ProvideOffer);
+                this.connections.get(provideOffer.from)?.sendMessage(event);
+                break;
+            case EventType.ProvideAnswer:
+                const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
+                this.connections.get(provideAnswer.from)?.sendMessage(event);
+                break;
+            case EventType.ConnectionEstablished:
+                this.pendingConnectionQueue.pop();
+                break;
+        }
+    }
 }
-
-
 
