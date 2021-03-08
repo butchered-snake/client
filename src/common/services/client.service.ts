@@ -5,6 +5,8 @@ import {
     Event,
     FoodPosUpdate,
     HeadPosUpdate,
+    HeadEntering,
+    TailEntering,
     ProvideAnswer,
     ProvideOffer,
     RequestOffer,
@@ -55,16 +57,43 @@ export class ClientService {
             case EventType.HeadPosUpdate:
                 this.board.headIndicator = this.getNewHeadIndicatorPosition(event as HeadPosUpdate);
                 break;
-            case EventType.FoodPosUpdate:
-                if (this.board.food) {
-                    break;
-                }
-                this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
+            case EventType.HeadEntering:
+                const headEntering: HeadEntering = (event as HeadEntering);
+                this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos);
+                this.board.headDirection = headEntering.direction;
                 break;
+            case EventType.TailEntering:
+                const tailEntering: TailEntering = (event as TailEntering);
+                this.board.tail = this.getNewPosFromDirectionalPos(tailEntering.direction, tailEntering.oldPos);
+                break;
+
         }
     }
 
     processBoardEvent(event: Event) {
+        switch (event.type) {
+            case EventType.FoodEaten:
+                this.adminConnection!.sendMessage(event);
+                break;
+            case EventType.HeadEntering:
+                const headEntering: HeadEntering = (event as HeadEntering);
+                this.sendEventToNeighbour(headEntering.direction, headEntering);
+                break;
+            case EventType.TailEntering:
+                const tailEntering: TailEntering = (event as TailEntering);
+                this.sendEventToNeighbour(tailEntering.direction, tailEntering);
+                break;
+            case EventType.PlacedFood:
+                this.adminConnection!.sendMessage(event);
+                break;
+            case EventType.HeadPosUpdate:
+                const headPosUpdate: HeadPosUpdate = (event as HeadPosUpdate);
+                this.sendEventToNeighbour(headPosUpdate.direction, headPosUpdate);
+                break;
+            case EventType.StopGame:
+                this.adminConnection!.sendMessage(event);
+                break;
+        }
 
     }
 
@@ -78,6 +107,12 @@ export class ClientService {
                 break;
             case EventType.PlaceSnake:
                 this.board.setSnake();
+                break;
+            case EventType.FoodPosUpdate:
+                if (this.board.food) {
+                    break;
+                }
+                this.board.foodIndicator = this.getNewFoodIndicatorPosition(event as FoodPosUpdate);
                 break;
             case EventType.SetClientId:
                 const setClientId: SetClientId = (event as SetClientId);
@@ -134,6 +169,48 @@ export class ClientService {
         }
     }
 
+    private sendEventToNeighbour(direction: Direction, event: Event) {
+        this.neighbours.get(direction)?.connection?.sendMessage(event);
+    }
+
+    private getNewPosFromDirectionalPos(direction: Direction, oldPos: Position): Position {
+        let newPosition: Position = {
+            x: 0,
+            y: 0
+        };
+
+        switch (direction) {
+            case Direction.North:
+                newPosition = {
+                    x: oldPos.x,
+                    y: 0
+                };
+                break;
+            case Direction.East:
+                newPosition = {
+                    x: environment.boardSize - 1,
+                    y: oldPos.y
+                };
+                break;
+            case Direction.South:
+                newPosition = {
+                    x: oldPos.x,
+                    y: environment.boardSize - 1
+                };
+                break;
+            case Direction.West:
+                newPosition = {
+                    x: 0,
+                    y: oldPos.y
+                };
+                break;
+            default:
+                this.logger.error('neighbour events should not come from anyone other than N/E/S/W');
+                break;
+        }
+
+        return newPosition;
+    }
 
     getNeighbourDirection(neighbourId: ClientId): Direction {
         const coords = this.id.getCoordinates();

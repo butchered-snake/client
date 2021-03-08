@@ -14,7 +14,7 @@ export class BoardService {
     public grid: BoardCellState[][] = [];
     public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
     private moveQueue: Direction[] = [];
-    private headDirection: Direction = Direction.West;
+    public headDirection: Direction = Direction.West;
 
     private onEvent: (event: Event) => void;
 
