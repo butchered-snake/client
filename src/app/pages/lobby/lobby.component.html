@@ -23,8 +23,10 @@
                 Hey {{this.adminClientConnectionService.name}}, we are waiting for your friends
             </nb-card-header>
             <nb-card-body>
-                <div>
-                    Send them this code: {{this.adminClientConnectionService.code}}
+                <div class="mb-4">
+                    Send them this code: <br/>
+                    {{this.adminClientConnectionService.code}} <br/>
+                    <button (click)="saveToClipboard()" class="mt-3" nbButton>Copy to clipboard</button>
                 </div>
                 Currently connected:
                 <div *ngFor="let connection of this.adminClientConnectionService.peerConnections | keyvalue">
