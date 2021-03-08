@@ -140,8 +140,9 @@ export class BoardService {
             const event = this.detectCollision(newPosition);
             if (event) {
                 this.onEvent(event);
+            } else {
+                this.head = newPosition;
             }
-            this.head = newPosition;
         }
 
         if (this.tail) {
@@ -152,12 +153,13 @@ export class BoardService {
             } else {
                 const newPosition = this.getNewPosition(this.tail, direction);
                 this.changeGridCells([this.tail!], BoardCellState.Free);
-                this.changeGridCells([newPosition], BoardCellState.Tail);
                 const cellState = this.grid[newPosition.y][newPosition.x];
                 if (cellState === BoardCellState.Neighbor) {
                     this.onEvent(new TailEntering(direction, newPosition));
+                    this.tail = null;
+                } else {
+                    this.tail = newPosition;
                 }
-                this.tail = newPosition;
             }
         }
 
@@ -260,9 +262,11 @@ export class BoardService {
             case BoardCellState.Wall:
                 return new StopGame(`Bonk`);
             case BoardCellState.Neighbor:
+                this.head = null;
                 return new HeadEntering(this.headDirection, position);
             case BoardCellState.Food:
                 this.food = null;
+                this.head = position;
                 return new FoodEaten();
             default:
         }

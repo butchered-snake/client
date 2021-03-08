@@ -65,12 +65,12 @@ export class ClientService {
                     break;
                 case EventType.HeadEntering:
                     const headEntering: HeadEntering = (event as HeadEntering);
-                    this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos);
+                    this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos, 'head');
                     this.board.headDirection = headEntering.direction;
                     break;
                 case EventType.TailEntering:
                     const tailEntering: TailEntering = (event as TailEntering);
-                    this.board.tail = this.getNewPosFromDirectionalPos(tailEntering.direction, tailEntering.oldPos);
+                    this.board.tail = this.getNewPosFromDirectionalPos(tailEntering.direction, tailEntering.oldPos, 'tail');
                     break;
             }
         });
@@ -233,8 +233,8 @@ export class ClientService {
         this.neighbours.get(direction)?.connection?.sendMessage(event);
     }
 
-    private getNewPosFromDirectionalPos(direction: Direction, oldPos: Position): Position {
-        this.logger.info(`head entered from direction ${Direction[direction]} with coords: ${JSON.stringify(oldPos)}`);
+    private getNewPosFromDirectionalPos(direction: Direction, oldPos: Position, part: string): Position {
+        this.logger.info(`${part} entered from direction ${Direction[direction]} with coords: ${JSON.stringify(oldPos)}`);
         let newPosition: Position = {
             x: 0,
             y: 0
@@ -244,7 +244,7 @@ export class ClientService {
             case Direction.North:
                 newPosition = {
                     x: oldPos.x,
-                    y: environment.boardSize - 1
+                    y: environment.boardSize - 2
                 };
                 break;
             case Direction.East:
@@ -261,7 +261,7 @@ export class ClientService {
                 break;
             case Direction.West:
                 newPosition = {
-                    x: environment.boardSize - 1,
+                    x: environment.boardSize - 2,
                     y: oldPos.y
                 };
                 break;
