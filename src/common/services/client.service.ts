@@ -102,8 +102,10 @@ export class ClientService {
                 break;
             case EventType.ProvideAnswer:
                 const provideAnswer: ProvideAnswer = (event as ProvideAnswer);
-                let neighbour = this.neighbours.get(provideAnswer.from);
-                (neighbour?.connection as LocalRTCClient).setAnswer(JSON.parse(provideAnswer.answer));
+                let neighbour = this.neighbours.get(this.getNeighbourDirection(new ClientId(provideAnswer.from)));
+                if (neighbour?.connection) {
+                    (neighbour.connection as LocalRTCClient).setAnswer(JSON.parse(provideAnswer.answer));
+                }
                 break;
         }
     }
