@@ -14,6 +14,7 @@ export class BoardService {
     public grid: BoardCellState[][] = [];
     public neighbourNames: Map<Direction, string> = new Map<Direction, string>();
     public headDirection: Direction = Direction.West;
+    public combinedIndicator: boolean = false;
     private moveQueue: Direction[] = [];
     private onEvent: (event: Event) => void;
 
@@ -110,6 +111,8 @@ export class BoardService {
             this.changeGridCells([this.foodIndicator!], BoardCellState.Neighbor);
         }
         this._foodIndicator = value;
+        this.combinedIndicator = !!(this.foodIndicator && this.headIndicator && this.foodIndicator.x === this.headIndicator.x && this.foodIndicator.y === this.headIndicator.y);
+
     }
 
     elongateTail() {
