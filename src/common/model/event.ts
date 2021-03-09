@@ -3,7 +3,8 @@ import {Direction} from '../shared/direction.enum';
 import {Position} from '../shared/types';
 
 export class Event {
-    constructor(public type: EventType) {}
+    constructor(public type: EventType) {
+    }
 }
 
 // admin events
@@ -113,6 +114,12 @@ export class HeadEntering extends NeighbourEvent {
 export class TailEntering extends NeighbourEvent {
     constructor(direction: Direction, public oldPos: Position) {
         super(EventType.TailEntering, direction);
+    }
+}
+
+export class HeadPosLeavingContext extends NeighbourEvent {
+    constructor(direction: Direction) {
+        super(EventType.HeadPosLeavingContext, direction);
     }
 }
 

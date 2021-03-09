@@ -5,6 +5,7 @@ import {
     Event,
     FoodPosUpdate,
     HeadEntering,
+    HeadPosLeavingContext,
     HeadPosUpdate,
     PlacedFood,
     ProvideAnswer,
@@ -74,6 +75,9 @@ export class ClientService {
                     const tailEntering: TailEntering = (event as TailEntering);
                     this.board.tail = this.getNewPosFromDirectionalPos(tailEntering.direction, tailEntering.oldPos, 'tail');
                     break;
+                case EventType.HeadPosLeavingContext:
+                    this.board.headIndicator = null;
+                    break;
             }
         });
 
@@ -88,6 +92,11 @@ export class ClientService {
                 case EventType.HeadEntering:
                     const headEntering: HeadEntering = (event as HeadEntering);
                     this.sendEventToNeighbour(headEntering.direction, headEntering);
+                    this.neighbours.forEach((neighbour: Neighbour, direction: Direction) => {
+                        if (direction !== headEntering.direction) {
+                            neighbour.connection.sendMessage(new HeadPosLeavingContext(direction));
+                        }
+                    });
                     break;
                 case EventType.TailEntering:
                     const tailEntering: TailEntering = (event as TailEntering);

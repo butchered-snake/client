@@ -19,5 +19,6 @@ export enum EventType {
     // neighbour
     HeadPosUpdate,
     HeadEntering,
-    TailEntering
+    TailEntering,
+    HeadPosLeavingContext
 }
