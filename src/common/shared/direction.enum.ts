@@ -1,4 +1,6 @@
 export enum Direction {
+    NoDirection,
+
     North,
     East,
     South,

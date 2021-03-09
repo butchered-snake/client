@@ -119,7 +119,7 @@ export class BoardService {
         if (!this.tail) {
             return;
         }
-        // TODO implement this
+        this.moveQueue.push(Direction.NoDirection);
     }
 
     placeFood(): Position {
