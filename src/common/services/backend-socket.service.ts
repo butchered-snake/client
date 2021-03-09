@@ -42,6 +42,10 @@ export class BackendSocketService implements OnDestroy {
         });
     }
 
+    public deleteGame(id: string): void {
+        this.socket.emit('delete', id);
+    }
+
     public createGame(offer: string): void {
         this.socket.emit('create', offer);
     }

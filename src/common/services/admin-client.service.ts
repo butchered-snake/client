@@ -22,6 +22,7 @@ import {
 } from '../model/event';
 import {EventType} from '../shared/event-type.enum';
 import {interval, Observable, Subscription} from 'rxjs';
+import {BackendSocketService} from './backend-socket.service';
 
 @Injectable({
     providedIn: 'root'
@@ -38,8 +39,10 @@ export class AdminClientService {
     private tickTimer: Observable<number>;
     private tickSubscription: Subscription | undefined;
 
+
     constructor(private logger: LogService, private boardService: BoardService, private ngZone: NgZone,
-                private adminClientConnectionService: AdminClientConnectionService, private router: Router) {
+                private adminClientConnectionService: AdminClientConnectionService, private router: Router,
+                private backendSocketService: BackendSocketService) {
         this.pendingConnectionQueue = [];
         this.connectionChecker = interval(1000);
         this.tickTimer = interval(500);
@@ -232,7 +235,10 @@ export class AdminClientService {
     }
 
     private startGame(): void {
-        this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
+        this.router.navigate(['/game'], {}).then(value => {
+            this.backendSocketService.deleteGame(this.adminClientConnectionService.code);
+            this.logger.info('navigated to game');
+        });
         this.sendEventToRandomClient(new PlaceSnake());
         this.sendEventToRandomClient(new SetFood());
         this.sendEventToClients(new StartGame());
