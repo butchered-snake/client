@@ -317,8 +317,8 @@ export class ClientService {
                 break;
             case Direction.SouthEast:
                 newPosition = {
-                    x: environment.boardSize,
-                    y: environment.boardSize
+                    x: environment.boardSize - 1,
+                    y: environment.boardSize - 1
                 };
                 break;
             case Direction.South:

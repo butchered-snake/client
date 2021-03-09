@@ -257,7 +257,9 @@ export class BoardService {
     public changeGridCells(positions: Position[], cellState: BoardCellState): void {
         this.logger.info(`Update positions ${JSON.stringify(positions)} with cell state ${BoardCellState[cellState]}`);
         positions.forEach(position => {
-            this.grid[position.y][position.x] = cellState;
+            if (position) {
+                this.grid[position.y][position.x] = cellState;
+            }
         });
     }
 
