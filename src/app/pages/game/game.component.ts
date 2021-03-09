@@ -6,6 +6,8 @@ import {Direction} from '../../../common/shared/direction.enum';
 import {ClientService} from '../../../common/services/client.service';
 import {LogService} from '../../../common/services/log.service';
 import {fromEvent, Subscription} from 'rxjs';
+import {NbDialogService} from '@nebular/theme';
+import {Router} from '@angular/router';
 
 @Component({
     selector: 'app-game',
@@ -19,7 +21,8 @@ export class GameComponent implements OnInit, OnDestroy {
     public direction = Direction;
     private keyPressSubscription: Subscription;
 
-    constructor(private logger: LogService, public boardService: BoardService, public clientService: ClientService) {
+    constructor(private logger: LogService, public boardService: BoardService, public clientService: ClientService,
+                private dialogService: NbDialogService, private router: Router) {
         const keyEvent = fromEvent(document, 'keyup');
         this.keyPressSubscription = keyEvent.subscribe(event => {
             switch ((event as KeyboardEvent).key) {

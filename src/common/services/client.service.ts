@@ -26,6 +26,9 @@ import {RemoteRTCClient} from '../model/remote-rtc-client';
 import {Position} from '../shared/types';
 import {environment} from '../../environments/environment';
 import {Subject} from 'rxjs';
+import {GameStoppedDialogComponent} from '../dialogs/game-stopped-dialog/game-stopped-dialog.component';
+import {NbDialogService} from '@nebular/theme';
+import {Router} from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
@@ -37,7 +40,7 @@ export class ClientService {
     private neighbours: Map<Direction, Neighbour>;
     private adminConnection: RemoteRTCClient | null = null;
 
-    constructor(private logger: LogService, private board: BoardService, private ngZone: NgZone) {
+    constructor(private logger: LogService, private board: BoardService, private ngZone: NgZone, private dialogService: NbDialogService, private router: Router) {
         this.gameStarted = new Subject<void>();
         this.id = new ClientId(0);
         this.neighbours = new Map();
@@ -124,6 +127,13 @@ export class ClientService {
             let direction: Direction;
 
             switch (event.type) {
+                case EventType.StopGame:
+                    this.dialogService.open(GameStoppedDialogComponent, {}).onClose.subscribe(args => {
+                        this.router.navigate(['/new-game'], {}).then(value => {
+                            window.location.reload();
+                        });
+                    });
+                    break;
                 case EventType.Tick:
                     this.board.tick();
                     break;
