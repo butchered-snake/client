@@ -51,6 +51,8 @@ export class AdminClientService {
     public addConnections(): void {
         const amountOfConnections = this.adminClientConnectionService.peerConnections.size;
         let maxX = 0;
+        let maxReachedX = 0;
+        let maxReachedY = 0;
         let maxY = 0;
         let x = 0;
         let y = 0;
@@ -149,11 +151,14 @@ export class AdminClientService {
                     step++;
                     break;
             }
+
+            maxReachedX = this.getHigherNumber(maxReachedX, x);
+            maxReachedY = this.getHigherNumber(maxReachedY, y);
         }
 
-        this.maxX = maxX;
-        this.maxY = maxY;
-        this.logger.info(`maxX: ${maxX}, maxY: ${maxY}`);
+        this.maxX = maxReachedX;
+        this.maxY = maxReachedY;
+        this.logger.info(`maxX: ${this.maxX}, maxY: ${this.maxY}`);
 
         this.sendClientIdEvents();
         this.startClientHandshakes();
@@ -176,6 +181,10 @@ export class AdminClientService {
     sendEventToRandomClient(event: Event) {
         let keys = Array.from(this.connections.keys());
         this.connections.get(keys[Math.floor(Math.random() * keys.length)])?.sendMessage(event);
+    }
+
+    private getHigherNumber(num1: number, num2: number): number {
+        return num1 > num2 ? num1 : num2;
     }
 
     private sendClientIdEvents(): void {

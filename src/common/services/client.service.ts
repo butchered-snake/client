@@ -13,6 +13,7 @@ import {
     RequestOffer,
     SetClientId,
     SetFood,
+    StopGame,
     TailEntering
 } from '../model/event';
 import {EventType} from '../shared/event-type.enum';
@@ -29,6 +30,7 @@ import {Subject} from 'rxjs';
 import {GameStoppedDialogComponent} from '../dialogs/game-stopped-dialog/game-stopped-dialog.component';
 import {NbDialogService} from '@nebular/theme';
 import {Router} from '@angular/router';
+import {BoardCellState} from '../shared/board-cell-state.enum';
 
 @Injectable({
     providedIn: 'root'
@@ -70,7 +72,18 @@ export class ClientService {
                     break;
                 case EventType.HeadEntering:
                     const headEntering: HeadEntering = (event as HeadEntering);
-                    this.board.head = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos, 'head');
+                    const newHeadPosition = this.getNewPosFromDirectionalPos(headEntering.direction, headEntering.oldPos, 'head');
+
+                    switch (this.board.grid[newHeadPosition.y][newHeadPosition.x]) {
+                        case BoardCellState.Tail:
+                        case BoardCellState.Body:
+                            this.logger.error('Collision in head entering');
+                            this.adminConnection?.sendMessage(new StopGame('Cannibalism'));
+                            break;
+                        default:
+                    }
+
+                    this.board.head = newHeadPosition;
                     this.board.headDirection = headEntering.direction;
                     this.board.headIndicator = null;
                     break;
@@ -249,8 +262,8 @@ export class ClientService {
                 return Direction.West;
         }
 
-        this.logger.error('neighbour should not have same pos as client');
-        return 25;
+        this.logger.error(`neighbour ${JSON.stringify(neighbourCoords)} not in direct neighbourhood or on the same coordinate ${JSON.stringify(this.id.getCoordinates())}`);
+        return Direction.NoDirection;
     }
 
     private sendEventToNeighbour(direction: Direction, event: Event) {
@@ -308,6 +321,11 @@ export class ClientService {
         };
 
         const neighbourDirection = this.getNeighbourDirection(new ClientId(event.from));
+
+        //No neighbour relation
+        if (neighbourDirection === Direction.NoDirection) {
+            return null;
+        }
 
         switch (neighbourDirection) {
             case Direction.NorthWest:
