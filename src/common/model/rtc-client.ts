@@ -7,20 +7,20 @@ export abstract class RTCClient {
     public connectionEstablished: Subject<void>;
     protected peerConnection: RTCPeerConnection;
     protected dataChannel: RTCDataChannel | undefined;
-    private readonly _newIceCandidate: Subject<RTCSessionDescription>;
+    private readonly _newLocalDescription: Subject<RTCSessionDescription>;
     private onEvent: (event: Event) => void;
 
     protected constructor(private baseLogger: LogService) {
         this.connectionEstablished = new Subject<void>();
-        this._newIceCandidate = new Subject<RTCSessionDescription>();
+        this._newLocalDescription = new Subject<RTCSessionDescription>();
         this.peerConnection = new RTCPeerConnection();
         this.peerConnection.onicecandidateerror = (error: RTCPeerConnectionIceErrorEvent) => this.baseLogger.error('ice connection error', error.errorText);
         this.setUpDataChannel();
 
         this.peerConnection.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-            this.baseLogger.debug('new ice candidate on local connection');
+            this.baseLogger.debug('new ice candidate');
             if (this.peerConnection.localDescription) {
-                this._newIceCandidate.next(this.peerConnection.localDescription);
+                this._newLocalDescription.next(this.peerConnection.localDescription);
             }
         };
         this.onEvent = (event: Event) => {
@@ -28,8 +28,8 @@ export abstract class RTCClient {
         };
     }
 
-    get newIceCandidate(): Subject<RTCSessionDescription> {
-        return this._newIceCandidate;
+    get newLocalDescription(): Subject<RTCSessionDescription> {
+        return this._newLocalDescription;
     }
 
     abstract setUpDataChannel(): void;

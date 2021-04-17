@@ -15,6 +15,7 @@ export enum EventType {
     ProvideOffer,
     ProvideAnswer,
     ConnectionEstablished,
+    NavigatedToGame,
 
     // neighbour
     HeadPosUpdate,

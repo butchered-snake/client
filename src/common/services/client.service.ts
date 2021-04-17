@@ -8,6 +8,7 @@ import {
     HeadEntering,
     HeadPosLeavingContext,
     HeadPosUpdate,
+    NavigatedToGame,
     PlacedFood,
     ProvideAnswer,
     ProvideOffer,
@@ -30,8 +31,9 @@ import {environment} from '../../environments/environment';
 import {Subject} from 'rxjs';
 import {GameStoppedDialogComponent} from '../dialogs/game-stopped-dialog/game-stopped-dialog.component';
 import {NbDialogService} from '@nebular/theme';
-import {Router} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
 import {BoardCellState} from '../shared/board-cell-state.enum';
+import {filter} from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -48,6 +50,14 @@ export class ClientService {
         this.id = new ClientId(0);
         this.neighbours = new Map();
         this.board.setEventCallback(this.processBoardEvent.bind(this));
+
+        router.events.pipe(
+            filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+        ).subscribe(value => {
+            if (value.url === '/game') {
+                this.adminConnection?.sendMessage(new NavigatedToGame(this.id.id));
+            }
+        });
     }
 
     public initializeService(connection: RemoteRTCClient, name: string) {
@@ -187,7 +197,7 @@ export class ClientService {
                     direction = this.getNeighbourDirection(neighbourId);
                     const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
                     let gotOffer: boolean = false;
-                    localConnection.newIceCandidate.subscribe(offer => {
+                    localConnection.newLocalDescription.subscribe(offer => {
                         if (gotOffer) {
                             return;
                         }
@@ -208,7 +218,7 @@ export class ClientService {
                         remoteConnection.connectionEstablished.unsubscribe();
                     });
                     let gotAnswer: boolean = false;
-                    remoteConnection.newIceCandidate.subscribe((answer) => {
+                    remoteConnection.newLocalDescription.subscribe((answer) => {
                         if (gotAnswer) {
                             return;
                         }

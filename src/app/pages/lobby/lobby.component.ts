@@ -3,6 +3,7 @@ import {AdminClientConnectionService} from '../../../common/services/admin-clien
 import {LogService} from '../../../common/services/log.service';
 import {AdminClientService} from '../../../common/services/admin-client.service';
 import {Clipboard} from '@angular/cdk/clipboard';
+import {ClientConnectionService} from '../../../common/services/client-connection.service';
 
 @Component({
     selector: 'app-lobby',
@@ -12,7 +13,13 @@ import {Clipboard} from '@angular/cdk/clipboard';
 export class LobbyComponent implements OnInit {
 
     constructor(private logger: LogService, public adminClientConnectionService: AdminClientConnectionService,
-                private adminClientService: AdminClientService, private clipboard: Clipboard) {
+                private adminClientService: AdminClientService, private clipboard: Clipboard,
+                private clientConnectionService: ClientConnectionService) {
+        adminClientConnectionService.createdGame.subscribe(value => {
+            this.clientConnectionService.code = value;
+            this.clientConnectionService.name = this.adminClientConnectionService.name;
+            this.clientConnectionService.joinGame();
+        });
     }
 
     ngOnInit(): void {

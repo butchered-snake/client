@@ -92,6 +92,12 @@ export class ConnectionEstablished extends AdminEvent {
     }
 }
 
+export class NavigatedToGame extends AdminEvent {
+    constructor(public from: number) {
+        super(EventType.NavigatedToGame);
+    }
+}
+
 // neighbour events
 export class NeighbourEvent extends Event {
     constructor(type: EventType, public direction: Direction) {

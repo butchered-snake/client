@@ -23,7 +23,7 @@ export class AdminClientConnectionService {
     constructor(private logger: LogService,
                 private backendSocketService: BackendSocketService) {
         this.pendingConnection = new LocalRTCClient(logger);
-        this.currentICECandidateSubscription = this.pendingConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
+        this.currentICECandidateSubscription = this.pendingConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
         this.gameCreatedSubscription = this.backendSocketService.events.get(SocketEvents.GameCreated)!.subscribe(this.gameCreated.bind(this));
         this.answerSubscription = this.backendSocketService.events.get(SocketEvents.Answer)!.subscribe(this.gotAnswer.bind(this));
         this.createdGame = new Subject<string>();
@@ -59,7 +59,7 @@ export class AdminClientConnectionService {
     }
 
     private setUpPendingConnection(): void {
-        this.currentICECandidateSubscription = this.pendingConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
+        this.currentICECandidateSubscription = this.pendingConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
     }
 
     private gotAnswer(args: AnswerEventData): void {

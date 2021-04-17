@@ -19,7 +19,7 @@ export class ClientConnectionService {
     constructor(private logger: LogService, private backendSocketService: BackendSocketService, private clientService: ClientService) {
         this.peerConnection = new RemoteRTCClient(logger);
         this.offerSubscription = this.backendSocketService.events.get(SocketEvents.Offer)!.subscribe(this.gotOffer.bind(this));
-        this.currentICECandidateSubscription = this.peerConnection.newIceCandidate.subscribe(this.newIceCandidate.bind(this));
+        this.currentICECandidateSubscription = this.peerConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
 
         this.peerConnection.connectionEstablished.subscribe(value => {
             this.clientService.initializeService(this.peerConnection, this.name);
@@ -47,6 +47,7 @@ export class ClientConnectionService {
     }
 
     public joinGame(): void {
+        this.logger.info(`Joining game with code ${this.code}`);
         this.backendSocketService.joinGame(this.code);
     }
 

@@ -32,9 +32,11 @@ export class AdminClientService {
     private idToName: Map<number, string> = new Map<number, string>();
     private connections: Map<number, LocalRTCClient> = new Map<number, LocalRTCClient>();
     private pendingConnectionQueue: boolean[];
+    private pendingNavigationQueue: boolean[];
     private maxX: number = 0;
     private maxY: number = 0;
     private pendingConnectionsSubscription: Subscription | undefined;
+    private pendingNavigationSubscription: Subscription | undefined;
     private connectionChecker: Observable<number>;
     private tickTimer: Observable<number>;
     private tickSubscription: Subscription | undefined;
@@ -44,6 +46,7 @@ export class AdminClientService {
                 private adminClientConnectionService: AdminClientConnectionService, private router: Router,
                 private backendSocketService: BackendSocketService) {
         this.pendingConnectionQueue = [];
+        this.pendingNavigationQueue = [];
         this.connectionChecker = interval(1000);
         this.tickTimer = interval(500);
     }
@@ -160,16 +163,30 @@ export class AdminClientService {
         this.maxY = maxReachedY;
         this.logger.info(`maxX: ${this.maxX}, maxY: ${this.maxY}`);
 
+        this.connections.forEach((connection: LocalRTCClient, id: number) => {
+            this.pendingNavigationQueue.push(true);
+        });
+
         this.sendClientIdEvents();
         this.startClientHandshakes();
 
-        this.pendingConnectionsSubscription = this.connectionChecker.subscribe((value => {
+        this.pendingConnectionsSubscription = this.connectionChecker.subscribe(value => {
             this.logger.info(`Checking connection queue. ${this.pendingConnectionQueue.length} left`);
             if (this.pendingConnectionQueue.length === 0) {
                 this.pendingConnectionsSubscription!.unsubscribe();
                 this.startGame();
             }
-        }));
+        });
+
+        this.pendingNavigationSubscription = this.connectionChecker.subscribe(value => {
+            this.logger.info(`Checking navigation queue. ${this.pendingNavigationQueue.length} left`);
+            if (this.pendingNavigationQueue.length === 0) {
+                this.pendingNavigationSubscription!.unsubscribe();
+                this.tickSubscription = this.tickTimer.subscribe((value) => {
+                    this.sendEventToClients(new Tick());
+                });
+            }
+        });
     }
 
     sendEventToClients(event: Event) {
@@ -251,9 +268,6 @@ export class AdminClientService {
         this.sendEventToRandomClient(new PlaceSnake());
         this.sendEventToRandomClient(new SetFood());
         this.sendEventToClients(new StartGame());
-        this.tickSubscription = this.tickTimer.subscribe((value) => {
-            this.sendEventToClients(new Tick());
-        });
     }
 
     private addConnectionToMap(position: Position, name: string, connection: LocalRTCClient): void {
@@ -292,6 +306,9 @@ export class AdminClientService {
                     break;
                 case EventType.ConnectionEstablished:
                     this.pendingConnectionQueue.pop();
+                    break;
+                case EventType.NavigatedToGame:
+                    this.pendingNavigationQueue.pop();
                     break;
             }
         });
