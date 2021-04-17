@@ -19,15 +19,18 @@ export class RemoteRTCClient extends RTCClient {
         };
     }
 
-    public createNewAnswer(): void {
-        this.peerConnection.createAnswer()
-            .then((answer: RTCSessionDescriptionInit) => {
-                this.peerConnection.setLocalDescription(answer).then(value => this.logger.info('Set local answer description'));
-            }).then(event => this.logger.debug('answer created successfully'));
+    public async createNewAnswer(): Promise<RTCSessionDescriptionInit> {
+        const description = await this.peerConnection.createAnswer();
+        this.logger.debug('created new answer');
+
+        await this.peerConnection.setLocalDescription(description).then(value => this.logger.info('Set local answer description')).catch(reason => this.logger.error(`error while setting local description ${reason}`));
+
+        return new Promise<RTCSessionDescriptionInit>(resolve => resolve(description));
     }
 
-    public setOffer(offer: RTCSessionDescriptionInit): Promise<void> {
-        return this.peerConnection.setRemoteDescription(offer).then(value => this.logger.info('Offer set successfully'));
+    public async setOffer(offer: RTCSessionDescriptionInit): Promise<void> {
+        await this.peerConnection.setRemoteDescription(offer).then(value => this.logger.debug('offer set successfully')).catch(reason => this.logger.error(`error while setting remote offer ${reason}`));
+
     }
 
 

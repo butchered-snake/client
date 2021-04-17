@@ -196,15 +196,9 @@ export class ClientService {
                     neighbourId = new ClientId(requestOffer.from);
                     direction = this.getNeighbourDirection(neighbourId);
                     const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
-                    let gotOffer: boolean = false;
-                    localConnection.newLocalDescription.subscribe(offer => {
-                        if (gotOffer) {
-                            return;
-                        }
-                        this.adminConnection?.sendMessage(new ProvideOffer(this.id.id, '', neighbourId.id, JSON.stringify(offer)));
-                        gotOffer = true;
+                    localConnection.createNewOffer().then(value => {
+                        this.adminConnection?.sendMessage(new ProvideOffer(this.id.id, '', neighbourId.id, JSON.stringify(value)));
                     });
-                    localConnection.createNewOffer();
                     this.addNeighbour(direction, neighbourId, localConnection);
                     this.board.addNeighbour(direction, requestOffer.fromName);
                     break;
@@ -217,16 +211,10 @@ export class ClientService {
                         this.adminConnection?.sendMessage(new ConnectionEstablished(this.id.id, neighbourId.id));
                         remoteConnection.connectionEstablished.unsubscribe();
                     });
-                    let gotAnswer: boolean = false;
-                    remoteConnection.newLocalDescription.subscribe((answer) => {
-                        if (gotAnswer) {
-                            return;
-                        }
-                        this.adminConnection?.sendMessage(new ProvideAnswer(this.id.id, neighbourId.id, JSON.stringify(answer)));
-                        gotAnswer = true;
-                    });
-                    remoteConnection.setOffer(JSON.parse(provideOffer.offer)).then((res) => {
-                        remoteConnection.createNewAnswer();
+                    remoteConnection.setOffer(JSON.parse(provideOffer.offer)).then(() => {
+                        remoteConnection.createNewAnswer().then(value => {
+                            this.adminConnection?.sendMessage(new ProvideAnswer(this.id.id, neighbourId.id, JSON.stringify(value)));
+                        });
                     });
                     this.addNeighbour(direction, neighbourId, remoteConnection);
                     this.board.addNeighbour(direction, provideOffer.fromName);
