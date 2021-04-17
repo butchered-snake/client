@@ -22,12 +22,12 @@ export class RemoteRTCClient extends RTCClient {
     public createNewAnswer(): void {
         this.peerConnection.createAnswer()
             .then((answer: RTCSessionDescriptionInit) => {
-                this.peerConnection.setLocalDescription(answer);
+                this.peerConnection.setLocalDescription(answer).then(value => this.logger.info('Set local answer description'));
             }).then(event => this.logger.debug('answer created successfully'));
     }
 
     public setOffer(offer: RTCSessionDescriptionInit): Promise<void> {
-        return this.peerConnection.setRemoteDescription(offer);
+        return this.peerConnection.setRemoteDescription(offer).then(value => this.logger.info('Offer set successfully'));
     }
 
 

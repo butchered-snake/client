@@ -20,12 +20,12 @@ export class LocalRTCClient extends RTCClient {
     public createNewOffer(): void {
         this.peerConnection.createOffer()
             .then((offer: RTCSessionDescriptionInit) => {
-                this.peerConnection.setLocalDescription(offer);
+                this.peerConnection.setLocalDescription(offer).then(value => this.logger.info('Set local offer description'));
             }).then(event => this.logger.debug('created new offer'));
     }
 
     public setAnswer(answer: RTCSessionDescriptionInit): void {
-        this.peerConnection.setRemoteDescription(answer).then(event => this.logger.debug('answer set successfully'));
+        this.peerConnection.setRemoteDescription(answer).then(event => this.logger.debug('answer set successfully')).catch(reason => this.logger.error('error setting answer'));
     }
 
 }
