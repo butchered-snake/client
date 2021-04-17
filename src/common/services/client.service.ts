@@ -3,6 +3,7 @@ import {LogService} from './log.service';
 import {
     ConnectionEstablished,
     Event,
+    FoodEaten,
     FoodPosUpdate,
     HeadEntering,
     HeadPosLeavingContext,
@@ -79,6 +80,9 @@ export class ClientService {
                         case BoardCellState.Body:
                             this.logger.error('Collision in head entering');
                             this.adminConnection?.sendMessage(new StopGame('Cannibalism'));
+                            break;
+                        case BoardCellState.Food:
+                            this.adminConnection?.sendMessage(new FoodEaten());
                             break;
                         default:
                     }
