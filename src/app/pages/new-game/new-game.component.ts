@@ -26,8 +26,8 @@ export class NewGameComponent implements OnInit {
     }
 
     public openNewGameDialog() {
-        this.dialogService.open(NewGameDialogComponent, {}).onClose.subscribe(name => {
-            this.logger.debug(`game name: ${name}`);
+        this.dialogService.open(NewGameDialogComponent, {hasBackdrop: false, closeOnEsc: false}).onClose.subscribe(name => {
+            this.logger.debug(`game name: ${name} `);
             this.router.navigate(['/lobby'], {}).then(value => {
                 this.adminClientConnectionService.name = name;
                 this.adminClientConnectionService.requestNewGame();
@@ -38,7 +38,7 @@ export class NewGameComponent implements OnInit {
     }
 
     public openJoinGameDialog() {
-        this.dialogService.open(JoinGameDialogComponent, {}).onClose.subscribe(args => {
+        this.dialogService.open(JoinGameDialogComponent, {hasBackdrop: false, closeOnEsc: false}).onClose.subscribe(args => {
             this.router.navigate(['/wait-lobby'], {}).then(value => {
                 this.clientConnectionService.name = args.name;
                 this.clientConnectionService.code = args.code;
