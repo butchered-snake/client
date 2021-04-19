@@ -263,6 +263,7 @@ export class AdminClientService {
     private startGame(): void {
         this.router.navigate(['/game'], {}).then(value => {
             this.backendSocketService.deleteGame(this.adminClientConnectionService.code);
+            this.adminClientConnectionService.code = '';
             this.logger.info('navigated to game');
         });
         this.sendEventToRandomClient(new PlaceSnake());
