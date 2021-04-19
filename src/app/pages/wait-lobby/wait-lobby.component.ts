@@ -12,9 +12,14 @@ import {ClientService} from '../../../common/services/client.service';
 })
 export class WaitLobbyComponent implements OnDestroy {
 
+    public shouldLoad = true;
     private gameStartedSubscription: Subscription;
+    private gameCanceledSubscription: Subscription;
 
     constructor(public clientConnectionService: ClientConnectionService, private clientService: ClientService, private router: Router, private logger: LogService, private ngZone: NgZone) {
+        this.gameCanceledSubscription = this.clientService.gameCancled.subscribe(() => {
+            this.shouldLoad = false;
+        });
         this.gameStartedSubscription = this.clientService.gameStarted.subscribe(() => {
             this.ngZone.run(() => {
                 this.router.navigate(['/game'], {}).then(value => this.logger.info('navigated to game'));
@@ -24,6 +29,7 @@ export class WaitLobbyComponent implements OnDestroy {
 
     ngOnDestroy(): void {
         this.gameStartedSubscription.unsubscribe();
+        this.gameCanceledSubscription.unsubscribe();
     }
 }
 

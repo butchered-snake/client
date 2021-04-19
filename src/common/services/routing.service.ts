@@ -3,7 +3,6 @@ import {filter} from 'rxjs/operators';
 import {NavigationEnd, Router} from '@angular/router';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {BackendSocketService} from './backend-socket.service';
-import {AdminClientService} from './admin-client.service';
 import {StopGame} from '../model/event';
 
 @Injectable({
@@ -14,7 +13,7 @@ export class RoutingService {
     private previousRoute: string = '/new-game';
 
     constructor(private router: Router, private adminClientConnectionService: AdminClientConnectionService,
-                private backendSocketService: BackendSocketService, private adminClientService: AdminClientService) {
+                private backendSocketService: BackendSocketService) {
         router.events.pipe(
             filter((e): e is NavigationEnd => e instanceof NavigationEnd),
         ).subscribe(value => {
@@ -30,7 +29,7 @@ export class RoutingService {
     }
 
     private informClients(): void {
-        this.adminClientService.sendEventToClients(new StopGame('Game lobby left'));
+        this.adminClientConnectionService.sendToClients(new StopGame('Game lobby left'));
     }
 
     private checkForLingeringGame(): void {

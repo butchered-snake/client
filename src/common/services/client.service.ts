@@ -41,12 +41,14 @@ import {filter} from 'rxjs/operators';
 export class ClientService {
     public name: string = '';
     public gameStarted: Subject<void>;
+    public gameCancled: Subject<void>;
     private id: ClientId;
     private neighbours: Map<Direction, Neighbour>;
     private adminConnection: RemoteRTCClient | null = null;
 
     constructor(private logger: LogService, private board: BoardService, private ngZone: NgZone, private dialogService: NbDialogService, private router: Router, private toastrService: NbToastrService) {
         this.gameStarted = new Subject<void>();
+        this.gameCancled = new Subject<void>();
         this.id = new ClientId(0);
         this.neighbours = new Map();
         this.board.setEventCallback(this.processBoardEvent.bind(this));
@@ -155,6 +157,8 @@ export class ClientService {
 
             switch (event.type) {
                 case EventType.StopGame:
+                    this.gameCancled.next();
+                    this.logger.warn(`Game stopped reason: ${(event as StopGame).reason}`);
                     this.dialogService.open(GameStoppedDialogComponent, {}).onClose.subscribe(args => {
                         this.router.navigate(['/new-game'], {}).then(value => {
                         });

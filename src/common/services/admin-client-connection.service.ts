@@ -6,6 +6,8 @@ import {SocketEvents} from '../shared/socket-events.enum';
 import {AnswerEventData} from '../shared/types';
 import {LogService} from './log.service';
 import {NbToastrService} from '@nebular/theme';
+import {Event} from '../model/event';
+
 
 @Injectable({
     providedIn: 'root'
@@ -55,8 +57,8 @@ export class AdminClientConnectionService {
         this.logger.info('start a new game');
     }
 
-    public addPeerConnection(connection: LocalRTCClient): void {
-        this.peerConnections.set(this.name, connection);
+    public sendToClients(event: Event): void {
+        this.peerConnections.forEach((value: LocalRTCClient, key: string) => value.sendMessage(event));
     }
 
     private setUpPendingConnection(): void {
