@@ -245,6 +245,34 @@ export class ClientService {
         });
 
     }
+    
+    getGlobalNeighbourDirection(neighbourId: ClientId): Direction {
+        const ownCoords = this.id.getCoordinates();
+        const neighbourCoords = neighbourId.getCoordinates();
+        const degree = (Math.atan2(ownCoords.y - neighbourCoords.y, ownCoords.x - neighbourCoords.x) * 180 / Math.PI + 180) % 360;
+
+        switch (degree) {
+            case 0:
+                return Direction.East;
+            case 90:
+                return Direction.South;
+            case 180:
+                return Direction.West;
+            case 270:
+                return Direction.North;
+            default:
+                if (degree > 270) {
+                    return Direction.NorthEast;
+                }
+                if (degree > 180) {
+                    return Direction.NorthWest;
+                }
+                if (degree > 90) {
+                    return Direction.SouthWest;
+                }
+                return Direction.SouthEast;
+        }
+    }
 
     getNeighbourDirection(neighbourId: ClientId): Direction {
         const coords = this.id.getCoordinates();
@@ -337,7 +365,7 @@ export class ClientService {
             y: 0
         };
 
-        const neighbourDirection = this.getNeighbourDirection(new ClientId(event.from));
+        const neighbourDirection = this.getGlobalNeighbourDirection(new ClientId(event.from));
 
         //No neighbour relation
         if (neighbourDirection === Direction.NoDirection) {
