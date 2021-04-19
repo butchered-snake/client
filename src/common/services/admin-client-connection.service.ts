@@ -65,7 +65,6 @@ export class AdminClientConnectionService {
 
     private onConnectionEstablished(): void {
         this.webRTCConnectionCount++;
-        console.log('webrtc count: ' + this.webRTCConnectionCount);
     }
 
     private setUpPendingConnection(): void {

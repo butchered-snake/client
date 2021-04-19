@@ -4,6 +4,7 @@ import {NavigationEnd, Router} from '@angular/router';
 import {AdminClientConnectionService} from './admin-client-connection.service';
 import {BackendSocketService} from './backend-socket.service';
 import {StopGame} from '../model/event';
+import {LogService} from './log.service';
 
 @Injectable({
     providedIn: 'root'
@@ -13,11 +14,11 @@ export class RoutingService {
     private previousRoute: string = '/new-game';
 
     constructor(private router: Router, private adminClientConnectionService: AdminClientConnectionService,
-                private backendSocketService: BackendSocketService) {
+                private backendSocketService: BackendSocketService, private logger: LogService) {
         router.events.pipe(
             filter((e): e is NavigationEnd => e instanceof NavigationEnd),
         ).subscribe(value => {
-            console.log(`previous: ${this.previousRoute}. New: ${value.url}`);
+            this.logger.info(`previous route: ${this.previousRoute}. New route: ${value.url}`);
             if (value.url === '/new-game' && this.previousRoute !== '/new-game') {
                 this.checkForLingeringGame();
                 this.informClients();
