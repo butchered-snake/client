@@ -1,6 +1,7 @@
 import {Subject} from 'rxjs';
 import {LogService} from '../services/log.service';
 import {Event} from './event';
+import {NbToastrService} from '@nebular/theme';
 
 export abstract class RTCClient {
 
@@ -10,7 +11,7 @@ export abstract class RTCClient {
     private readonly _newLocalDescription: Subject<RTCSessionDescription>;
     private onEvent: (event: Event) => void;
 
-    protected constructor(private baseLogger: LogService) {
+    protected constructor(private baseLogger: LogService, private toastService: NbToastrService) {
         this.connectionEstablished = new Subject<void>();
         this._newLocalDescription = new Subject<RTCSessionDescription>();
         this.peerConnection = new RTCPeerConnection();
@@ -35,7 +36,8 @@ export abstract class RTCClient {
     abstract setUpDataChannel(): void;
 
     public sendMessage(message: Event): void {
-        if (!this.dataChannel) {
+        if (!this.dataChannel || this.dataChannel.readyState !== 'open') {
+            this.toastService.danger(`Data channel is not set correctly. You should probably restart the game`, 'error');
             return;
         }
 

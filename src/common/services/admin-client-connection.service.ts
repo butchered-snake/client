@@ -5,6 +5,7 @@ import {Subject, Subscription} from 'rxjs';
 import {SocketEvents} from '../shared/socket-events.enum';
 import {AnswerEventData} from '../shared/types';
 import {LogService} from './log.service';
+import {NbToastrService} from '@nebular/theme';
 
 @Injectable({
     providedIn: 'root'
@@ -21,8 +22,8 @@ export class AdminClientConnectionService {
     private alreadyGotOffer: boolean = false;
 
     constructor(private logger: LogService,
-                private backendSocketService: BackendSocketService) {
-        this.pendingConnection = new LocalRTCClient(logger);
+                private backendSocketService: BackendSocketService, private toastrService: NbToastrService) {
+        this.pendingConnection = new LocalRTCClient(logger, toastrService);
         this.currentICECandidateSubscription = this.pendingConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
         this.gameCreatedSubscription = this.backendSocketService.events.get(SocketEvents.GameCreated)!.subscribe(this.gameCreated.bind(this));
         this.answerSubscription = this.backendSocketService.events.get(SocketEvents.Answer)!.subscribe(this.gotAnswer.bind(this));
@@ -65,7 +66,7 @@ export class AdminClientConnectionService {
     private gotAnswer(args: AnswerEventData): void {
         this.pendingConnection.setAnswer(JSON.parse(args.answer));
         this.peerConnections.set(args.name, this.pendingConnection);
-        this.pendingConnection = new LocalRTCClient(this.logger);
+        this.pendingConnection = new LocalRTCClient(this.logger, this.toastrService);
         this.setUpPendingConnection();
         this.pendingConnection.createNewOffer();
         this.isGameCreated = true;

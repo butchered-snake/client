@@ -1,10 +1,11 @@
 import {RTCClient} from './rtc-client';
 import {LogService} from '../services/log.service';
+import {NbToastrService} from '@nebular/theme';
 
 export class LocalRTCClient extends RTCClient {
 
-    constructor(private logger: LogService) {
-        super(logger);
+    constructor(private logger: LogService, private toastrService: NbToastrService) {
+        super(logger, toastrService);
     }
 
     setUpDataChannel(): void {

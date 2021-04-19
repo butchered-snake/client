@@ -30,7 +30,7 @@ import {Position} from '../shared/types';
 import {environment} from '../../environments/environment';
 import {Subject} from 'rxjs';
 import {GameStoppedDialogComponent} from '../dialogs/game-stopped-dialog/game-stopped-dialog.component';
-import {NbDialogService} from '@nebular/theme';
+import {NbDialogService, NbToastrService} from '@nebular/theme';
 import {NavigationEnd, Router} from '@angular/router';
 import {BoardCellState} from '../shared/board-cell-state.enum';
 import {filter} from 'rxjs/operators';
@@ -45,7 +45,7 @@ export class ClientService {
     private neighbours: Map<Direction, Neighbour>;
     private adminConnection: RemoteRTCClient | null = null;
 
-    constructor(private logger: LogService, private board: BoardService, private ngZone: NgZone, private dialogService: NbDialogService, private router: Router) {
+    constructor(private logger: LogService, private board: BoardService, private ngZone: NgZone, private dialogService: NbDialogService, private router: Router, private toastrService: NbToastrService) {
         this.gameStarted = new Subject<void>();
         this.id = new ClientId(0);
         this.neighbours = new Map();
@@ -195,7 +195,7 @@ export class ClientService {
                     const requestOffer: RequestOffer = (event as RequestOffer);
                     neighbourId = new ClientId(requestOffer.from);
                     direction = this.getNeighbourDirection(neighbourId);
-                    const localConnection: LocalRTCClient = new LocalRTCClient(this.logger);
+                    const localConnection: LocalRTCClient = new LocalRTCClient(this.logger, this.toastrService);
                     let gotOffer: boolean = false;
                     localConnection.newLocalDescription.subscribe(offer => {
                         if (gotOffer) {
@@ -212,7 +212,7 @@ export class ClientService {
                     const provideOffer: ProvideOffer = (event as ProvideOffer);
                     neighbourId = new ClientId(provideOffer.from);
                     direction = this.getNeighbourDirection(neighbourId);
-                    const remoteConnection: RemoteRTCClient = new RemoteRTCClient(this.logger);
+                    const remoteConnection: RemoteRTCClient = new RemoteRTCClient(this.logger, this.toastrService);
                     remoteConnection.connectionEstablished.subscribe(value => {
                         this.adminConnection?.sendMessage(new ConnectionEstablished(this.id.id, neighbourId.id));
                         remoteConnection.connectionEstablished.unsubscribe();

@@ -3,7 +3,7 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {AppComponent} from './app.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {NbDialogModule, NbThemeModule} from '@nebular/theme';
+import {NbDialogModule, NbThemeModule, NbToastrModule} from '@nebular/theme';
 import {NbEvaIconsModule} from '@nebular/eva-icons';
 import {AppRoutingModule} from './app-routing.module';
 import {NewGameModule} from './pages/new-game/new-game.module';
@@ -25,6 +25,7 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
         NbEvaIconsModule,
         AppRoutingModule,
         NewGameModule,
+        NbToastrModule.forRoot({}),
         LobbyModule,
         WaitLobbyModule,
         GameModule,

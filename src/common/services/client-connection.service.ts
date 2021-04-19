@@ -5,6 +5,7 @@ import {SocketEvents} from '../shared/socket-events.enum';
 import {RemoteRTCClient} from '../model/remote-rtc-client';
 import {LogService} from './log.service';
 import {ClientService} from './client.service';
+import {NbToastrService} from '@nebular/theme';
 
 @Injectable({
     providedIn: 'root'
@@ -16,8 +17,8 @@ export class ClientConnectionService {
     private offerSubscription: Subscription;
     private createdAnswer = false;
 
-    constructor(private logger: LogService, private backendSocketService: BackendSocketService, private clientService: ClientService) {
-        this.peerConnection = new RemoteRTCClient(logger);
+    constructor(private logger: LogService, private backendSocketService: BackendSocketService, private clientService: ClientService, private toastrService: NbToastrService) {
+        this.peerConnection = new RemoteRTCClient(logger, toastrService);
         this.offerSubscription = this.backendSocketService.events.get(SocketEvents.Offer)!.subscribe(this.gotOffer.bind(this));
         this.currentICECandidateSubscription = this.peerConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
 
