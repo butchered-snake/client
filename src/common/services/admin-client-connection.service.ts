@@ -60,6 +60,7 @@ export class AdminClientConnectionService {
     }
 
     private setUpPendingConnection(): void {
+        this.currentICECandidateSubscription.unsubscribe();
         this.currentICECandidateSubscription = this.pendingConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
     }
 
@@ -68,9 +69,9 @@ export class AdminClientConnectionService {
         this.peerConnections.set(args.name, this.pendingConnection);
         this.pendingConnection = new LocalRTCClient(this.logger, this.toastrService);
         this.setUpPendingConnection();
-        this.pendingConnection.createNewOffer();
         this.isGameCreated = true;
         this.alreadyGotOffer = false;
+        this.pendingConnection.createNewOffer();
     }
 
     private gameCreated(gameId: string): void {
