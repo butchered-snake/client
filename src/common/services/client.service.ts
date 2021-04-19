@@ -157,7 +157,6 @@ export class ClientService {
                 case EventType.StopGame:
                     this.dialogService.open(GameStoppedDialogComponent, {}).onClose.subscribe(args => {
                         this.router.navigate(['/new-game'], {}).then(value => {
-                            window.location.reload();
                         });
                     });
                     break;
