@@ -16,6 +16,7 @@ export class AdminClientConnectionService {
 
     public createdGame: Subject<string>;
     public peerConnections: Map<string, LocalRTCClient> = new Map<string, LocalRTCClient>();
+    public webRTCConnectionCount = 0;
     private pendingConnection: LocalRTCClient;
     private currentICECandidateSubscription: Subscription;
     private gameCreatedSubscription: Subscription;
@@ -26,6 +27,7 @@ export class AdminClientConnectionService {
     constructor(private logger: LogService,
                 private backendSocketService: BackendSocketService, private toastrService: NbToastrService) {
         this.pendingConnection = new LocalRTCClient(logger, toastrService);
+        this.pendingConnection.connectionEstablished.subscribe(this.onConnectionEstablished.bind(this));
         this.currentICECandidateSubscription = this.pendingConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
         this.gameCreatedSubscription = this.backendSocketService.events.get(SocketEvents.GameCreated)!.subscribe(this.gameCreated.bind(this));
         this.answerSubscription = this.backendSocketService.events.get(SocketEvents.Answer)!.subscribe(this.gotAnswer.bind(this));
@@ -61,7 +63,13 @@ export class AdminClientConnectionService {
         this.peerConnections.forEach((value: LocalRTCClient, key: string) => value.sendMessage(event));
     }
 
+    private onConnectionEstablished(): void {
+        this.webRTCConnectionCount++;
+        console.log('webrtc count: ' + this.webRTCConnectionCount);
+    }
+
     private setUpPendingConnection(): void {
+        this.pendingConnection.connectionEstablished.subscribe(this.onConnectionEstablished.bind(this));
         this.currentICECandidateSubscription.unsubscribe();
         this.currentICECandidateSubscription = this.pendingConnection.newLocalDescription.subscribe(this.newIceCandidate.bind(this));
     }

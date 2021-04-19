@@ -35,7 +35,10 @@
                     </div>
                 </div>
                 <div>
-                    <button (click)="startGame()" class="mt-5" nbButton>Start game</button>
+                    <button (click)="startGame()"
+                            [disabled]="adminClientConnectionService.peerConnections.size !== adminClientConnectionService.webRTCConnectionCount"
+                            class="mt-5" nbButton>Start game
+                    </button>
                 </div>
             </nb-card-body>
         </nb-card>

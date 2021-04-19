@@ -245,7 +245,7 @@ export class ClientService {
         });
 
     }
-    
+
     getGlobalNeighbourDirection(neighbourId: ClientId): Direction {
         const ownCoords = this.id.getCoordinates();
         const neighbourCoords = neighbourId.getCoordinates();
