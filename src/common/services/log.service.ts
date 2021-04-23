@@ -8,7 +8,7 @@ export class LogService {
     constructor() { }
 
     debug(msg: string, ...optionalParams: any[]) {
-        console.info(buildEntry(LogLevel.Debug, msg, ...optionalParams));
+        console.debug(buildEntry(LogLevel.Debug, msg, ...optionalParams));
     }
 
     info(msg: string, ...optionalParams: any[]) {
@@ -16,11 +16,11 @@ export class LogService {
     }
 
     warn(msg: string, ...optionalParams: any[]) {
-        console.info(buildEntry(LogLevel.Warn, msg, ...optionalParams));
+        console.warn(buildEntry(LogLevel.Warn, msg, ...optionalParams));
     }
 
     error(msg: string, ...optionalParams: any[]) {
-        console.info(buildEntry(LogLevel.Error, msg, ...optionalParams));
+        console.error(buildEntry(LogLevel.Error, msg, ...optionalParams));
     }
 }
 
