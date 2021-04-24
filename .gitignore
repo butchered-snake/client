@@ -1,3 +1,5 @@
+# draw io files
+doc/*.xml
 
 # Created by https://www.toptal.com/developers/gitignore/api/angular,webstorm
 # Edit at https://www.toptal.com/developers/gitignore?templates=angular,webstorm
