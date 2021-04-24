@@ -57,10 +57,10 @@ The following describes the communication model.
 
 ### 2.1 Principle
 
-As described in the [butchered-backend readme](https://github.com/butchered-snake/server/README.md) one client can
-create a game and is considered the admin for this game. Other clients can then join the game. The admin's and the
-client's responsibilities are strictly separated. That means that everyone, including the admin, has an instance of the
-client running. The admin has an additional admin-client running to handle the administrative tasks.
+As described in the [butchered-backend readme](https://github.com/butchered-snake/server/blob/master/README.md) one
+client can create a game and is considered the admin for this game. Other clients can then join the game. The admin's
+and the client's responsibilities are strictly separated. That means that everyone, including the admin, has an instance
+of the client running. The admin has an additional admin-client running to handle the administrative tasks.
 
 The admin-client establishes a WebRTC connection with every client when they join the game. This allows each client to
 communicate with the admin. For nine clients this would look like this:  
