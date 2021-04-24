@@ -77,8 +77,8 @@ connections as clients joined the game, including the admin's client itself. The
 schematics:  
 ![combined-schematics](./doc/all-connections.svg)
 
-The hardcoded algorithm used to assign the individual board areas could be swapped out or made configurable in the
-future. For now however, it follows a rectangular zigzag pattern:  
+The current board creation algorithm uses the following rectangular zigzag pattern, which could be easily swapped out
+for another pattern in the future.  
 ![board-creation-pattern](./doc/board-creation.svg)
 
 During this board creation, every client is assigned an identifier. The identifier is an encoding of the board position
@@ -95,21 +95,21 @@ for the different event types.
 The following are events used in communication between admin-client and client. They inherit the `AdminEvent` type which
 could be used in the future to provide additional information.
 
-| event                 | data                                                         | usage                                                                                                                   |
+| event                 | data                                                         | usage                                                                                                                    |
 |-----------------------|--------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------|
 | SetClientId           | id: number                                                   | admin instructs client to assign itself the id                                                                          |
-| RequestOffer          | from: number, fromName: string, to: number                 | admin requests offer from client                                                                                        |
-| ProvideOffer          | from: number, fromName: string, to: number, offer: string | client provides offer to admin; admin forwards event to destination client                                              |
-| ProvideAnswer         | from: number, to: number, answer: string                   | client provides answer to received offer; admin forwards answer to client that provided offer                           |
-| ConnectionEstablished | from: number, to: number                                    | client reports that the connection to one of his neighbours has been established                                        |
+| RequestOffer          | from: number, fromName: string, to: number                   | admin requests offer from client                                                                                        |
+| ProvideOffer          | from: number, fromName: string, to: number, offer: string    | client provides offer to admin; admin forwards event to destination client                                              |
+| ProvideAnswer         | from: number, to: number, answer: string                     | client provides answer to received offer; admin forwards answer to client that provided offer                           |
+| ConnectionEstablished | from: number, to: number                                     | client reports that the connection to one of his neighbours has been established                                        |
 | PlaceSnake            |                                                              | admin instructs client to place the initial snake                                                                       |
 | StartGame             |                                                              | admin instructs all clients to navigate to their board view                                                             |
 | NavigatedToGame       | from: number                                                 | client reports it has navigated to the board view                                                                       |
 | StopGame              | reason: string                                               | client reports to the admin that the snake died; admin instructs all clients to display the game over message           |
 | Tick                  |                                                              | admin instructs all clients to run their update routine                                                                 |
 | SetFood               |                                                              | admin instructs client to place food on the board                                                                       |
-| PlacedFood            | newPos: Position, from: number                              | client reports that it has placed the food                                                                              |
-| FoodPosUpdate         | newPos: Position, from: number                              | admin instructs all clients to update their food indicator                                                              |
+| PlacedFood            | newPos: Position, from: number                               | client reports that it has placed the food                                                                              |
+| FoodPosUpdate         | newPos: Position, from: number                               | admin instructs all clients to update their food indicator                                                              |
 | FoodEaten             |                                                              | client reports that the food has been eaten; admin forwards event to all clients to make the snake grow at the tail end |
 
 The following are events used for the communication between neighbours. They inherit the `NeighbourEvent` type which
