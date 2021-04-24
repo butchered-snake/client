@@ -85,7 +85,7 @@ During this board creation, every client is assigned an identifier. The identifi
 in relation to the top left corner of the playable area. It is implemented as a 32 bit integer, where the first 16 bit
 represent the x index and the the remaining 16 bit represent the y index. That means the top left board has the id 0.
 The one below has the id 1 and the one to the right has the id 65536. As a result a client can deduce in which direction
-another client is placed based on it's id. This will be used in the event system which is elaborated next.
+another client is placed based on its id. This will be used in the event system which is elaborated next.
 
 ### 2.2 Events
 
@@ -121,7 +121,7 @@ receivers can always determine the direction of the event emitter.
 | HeadPosUpdate         | direction: Direction, newPos: Position | client reports to all neighbours the new head position; neighbours update their head indicator accordingly          |
 | HeadEntering          | direction: Direction, oldPos: Position | client reports to neighbour that the head will enter the neighbour's board                                          |
 | TailEntering          | direction: Direction, oldPos: Position | client reports to neighbour that the tail will enter the neighbour's board                                          |
-| HeadPosLeavingContext | direction: Direction                   | client reports to all neighbours that the head is leaving it's board and instructs to invalidate the head indicator |
+| HeadPosLeavingContext | direction: Direction                   | client reports to all neighbours that the head is leaving its board and instructs to invalidate the head indicator |
 
 From these events its clear what information an individual client knows about the board as a whole:
 
@@ -151,7 +151,7 @@ The following describes some implementation details about the actual representat
 
 The backbone of the gameplay is the board. It consists of `boardSize` x `boardSize` cells. Each cell can have a single
 state which dictates the rendered content.  
-When starting the game, the head is placed in the middle of a random player's board, by setting it's state to `Head`.
+When starting the game, the head is placed in the middle of a random player's board, by setting its state to `Head`.
 Then `snakeSize` - 2 body parts are placed to the right by setting the cell states to `Body`. Finally the tail is placed
 to the right by settings the cell state to `Tail`. Other possible cell states include `Free`, `Food`, `Wall`
 , `Neighbour`.  
@@ -168,7 +168,7 @@ will move to the next cell updating its state and set the state of its previous 
 push the direction into the fifo queue of the tail.  
 When the head moves through the client's board, the directions it took are stored inside the tail's fifo-queue and it
 will constantly produce body cells behind it. As soon as the tail enters the client's field it will start to pop the
-queue and take the same path as the head replacing the next body part with itself and setting it's previous position
+queue and take the same path as the head replacing the next body part with itself and setting its previous position
 to `Free`. Each client is only storing its part of the snake. That means no matter how long the snake is, a client will
 at most have to store (`boardSize` - 2) x (`boardSize` - 2) elements inside the fifo queue.  
 When a clients board contains the tail and a `FoodEaten` event is received, a `NoDirection` element is appended to the
@@ -203,7 +203,7 @@ For the `tail` colliding with:
    at the start.
 5. The current algorithm to place a new piece of food picks a random client and instructs it to place the food. Then the
    client determines a viable position (which is not obstructed by anything) and reports it back to the admin. The
-   problem is that it's possible (although very unlikely) that the client cannot find a viable position. This case is
+   problem is that its possible (although very unlikely) that the client cannot find a viable position. This case is
    not handled yet and should be considered in the future. Additionally it might be interesting to have more than one
    piece of food when there are a lot of players to keep the pace of the game  """fast""".
 6. This is a nice POC for a distributed snake using WebRTC. However, it is not viable for a production release yet. This
